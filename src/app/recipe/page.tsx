@@ -142,7 +142,12 @@ export default function RecipePage() {
         <h2 className="mt-8 mb-4 text-xl font-medium">All</h2>
         <div className="flex flex-wrap gap-4">
           {data.map((item) => (
-            <div key={item.id} className="relative h-[220px] w-[177px]">
+            <button
+              key={item.id}
+              type="button"
+              className="relative h-[220px] w-[177px]"
+              onClick={() => router.push(`/recipe/${item.id}`)}
+            >
               {/* Image */}
               <Image
                 alt="Classic Ham Roll Cheese Bread"
@@ -167,7 +172,7 @@ export default function RecipePage() {
               <div className="absolute bottom-3 w-full p-2 text-center text-sm text-white">
                 {item.title}
               </div>
-            </div>
+            </button>
           ))}
         </div>
       </section>
