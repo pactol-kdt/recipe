@@ -157,13 +157,13 @@ export default function RecipePage() {
               />
 
               {/* Favorite Button */}
-              <button type="button" className="absolute top-2 right-2">
+              <div className="absolute top-2 right-2">
                 {item.isFavorite ? (
                   <Heart className="fill-accent" color="white" />
                 ) : (
                   <Heart className="fill-text-secondary" color="white" />
                 )}
-              </button>
+              </div>
 
               {/* Gradient BG */}
               <div className="absolute inset-0 rounded-lg bg-[linear-gradient(to_bottom,rgba(0,0,0,0)_0%,rgba(0,0,0,0.8)_100%)]"></div>

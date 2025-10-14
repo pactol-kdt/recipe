@@ -1,58 +1,74 @@
-import { promises as fs } from 'fs';
-import path from 'path';
 import { NextResponse } from 'next/server';
+import { getDB } from '~/lib/db';
+import type { ResultSetHeader } from 'mysql2';
 
-interface Ingredient {
-  id: number;
-  name: string;
-  quantity: string;
-  unit: string;
-}
-
-const dataPath = path.join(process.cwd(), 'data', 'ingredients.json');
-
-async function readData(): Promise<Ingredient[]> {
+/**
+ * GET /api/ingredients
+ * Returns all ingredients
+ */
+export async function GET() {
   try {
-    const data = await fs.readFile(dataPath, 'utf8');
-    return JSON.parse(data || '[]') as Ingredient[];
-  } catch {
-    return [];
+    const db = getDB();
+    const [rows] = await db.query('SELECT * FROM ingredients ORDER BY id DESC');
+
+    // ✅ Ensure rows is always an array
+    const data = Array.isArray(rows) ? rows : [];
+
+    return NextResponse.json(data);
+  } catch (error) {
+    console.error('❌ Database GET error:', error);
+    return NextResponse.json([], { status: 500 }); // return empty array on error
   }
 }
 
-async function writeData(data: Ingredient[]): Promise<void> {
-  await fs.writeFile(dataPath, JSON.stringify(data, null, 2), 'utf8');
-}
+/**
+ * POST /api/ingredients
+ * Adds a new ingredient (expects { name: string })
+ */
 
-// GET all ingredients
-export async function GET() {
-  const data = await readData();
-  return NextResponse.json(data);
-}
-
-// POST new ingredient
 export async function POST(req: Request) {
-  const newItem = (await req.json()) as Omit<Ingredient, 'id'>;
-  const data = await readData();
+  try {
+    const { name } = await req.json();
 
-  const newIngredient: Ingredient = {
-    id: Date.now(),
-    ...newItem,
-  };
+    if (!name || typeof name !== 'string') {
+      return NextResponse.json({ error: 'Invalid name' }, { status: 400 });
+    }
 
-  data.push(newIngredient);
-  await writeData(data);
+    const db = getDB();
 
-  return NextResponse.json(newIngredient);
+    // ✅ Tell TypeScript what type of result MySQL returns
+    const [result] = await db.query<ResultSetHeader>('INSERT INTO ingredients (name) VALUES (?)', [
+      name,
+    ]);
+
+    return NextResponse.json({
+      message: 'Ingredient added',
+      insertId: result.insertId, // now fully typed
+    });
+  } catch (error) {
+    console.error('❌ Database POST error:', error);
+    return NextResponse.json({ error: 'Failed to add ingredient' }, { status: 500 });
+  }
 }
 
-// DELETE ingredient by id
+/**
+ * DELETE /api/ingredients?id=123
+ * Deletes an ingredient by ID
+ */
 export async function DELETE(req: Request) {
-  const { id } = (await req.json()) as { id: number };
-  const data = await readData();
+  try {
+    const { searchParams } = new URL(req.url);
+    const id = searchParams.get('id');
 
-  const updated = data.filter((item) => item.id !== id);
-  await writeData(updated);
+    if (!id) {
+      return NextResponse.json({ error: 'Missing id' }, { status: 400 });
+    }
 
-  return NextResponse.json({ success: true });
+    const db = getDB();
+    await db.query('DELETE FROM ingredients WHERE id = ?', [id]);
+    return NextResponse.json({ message: 'Ingredient deleted' });
+  } catch (error) {
+    console.error('❌ Database DELETE error:', error);
+    return NextResponse.json({ error: 'Failed to delete ingredient' }, { status: 500 });
+  }
 }
