@@ -57,7 +57,7 @@ const IngredientsSection = ({ ingredients }: { ingredients: Ingredient[] }) => {
         <div className="col-span-3">Quantity</div>
         <div className="col-span-3">Unit</div>
 
-        {items.map((item, idx) => (
+        {items.map((item) => (
           <div key={item.id} className="col-span-12 grid grid-cols-12 items-center gap-2">
             <span className="col-span-1 flex h-6 w-6 items-center justify-center rounded-full bg-gray-100 text-sm font-medium text-gray-700">
               {item.id}

@@ -361,15 +361,15 @@ export default function IngredientPage() {
   const id = Number(params.id); // convert to number for safety
   const item = data.find((d) => d.id === id); // safer than data[id - 1]
 
+  const [tab, setTab] = useState<'ingredients' | 'instruction'>('ingredients');
+  const [batchCount, setBatchCount] = useState(1);
+  const [isFavorite, setIsFavorite] = useState(item?.isFavorite);
+
   const router = useRouter();
 
   if (!item) {
     return <p>Item not found</p>;
   }
-
-  const [tab, setTab] = useState<'ingredients' | 'instruction'>('ingredients');
-  const [batchCount, setBatchCount] = useState(1);
-  const [isFavorite, setIsFavorite] = useState(item.isFavorite);
 
   const handleTabs = (tabName: 'ingredients' | 'instruction') => {
     setTab(tabName);

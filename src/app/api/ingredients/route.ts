@@ -2,18 +2,25 @@ import { promises as fs } from 'fs';
 import path from 'path';
 import { NextResponse } from 'next/server';
 
+interface Ingredient {
+  id: number;
+  name: string;
+  quantity: string;
+  unit: string;
+}
+
 const dataPath = path.join(process.cwd(), 'data', 'ingredients.json');
 
-async function readData() {
+async function readData(): Promise<Ingredient[]> {
   try {
     const data = await fs.readFile(dataPath, 'utf8');
-    return JSON.parse(data || '[]');
+    return JSON.parse(data || '[]') as Ingredient[];
   } catch {
     return [];
   }
 }
 
-async function writeData(data: any) {
+async function writeData(data: Ingredient[]): Promise<void> {
   await fs.writeFile(dataPath, JSON.stringify(data, null, 2), 'utf8');
 }
 
@@ -25,10 +32,10 @@ export async function GET() {
 
 // POST new ingredient
 export async function POST(req: Request) {
-  const newItem = await req.json();
+  const newItem = (await req.json()) as Omit<Ingredient, 'id'>;
   const data = await readData();
 
-  const newIngredient = {
+  const newIngredient: Ingredient = {
     id: Date.now(),
     ...newItem,
   };
@@ -41,10 +48,10 @@ export async function POST(req: Request) {
 
 // DELETE ingredient by id
 export async function DELETE(req: Request) {
-  const { id } = await req.json();
+  const { id } = (await req.json()) as { id: number };
   const data = await readData();
 
-  const updated = data.filter((item: any) => item.id !== id);
+  const updated = data.filter((item) => item.id !== id);
   await writeData(updated);
 
   return NextResponse.json({ success: true });
