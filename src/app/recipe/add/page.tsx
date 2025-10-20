@@ -6,6 +6,7 @@ import IngredientsSection from './_components/ingredients';
 import { useState } from 'react';
 import InstructionsSection from './_components/instruction';
 import ErrorLabel from '~/components/ErrorLabel';
+import { useRouter } from 'next/navigation';
 
 type Ingredient = {
   name: string;
@@ -19,6 +20,8 @@ type Instruction = {
 };
 
 export default function AddNewRecipePage() {
+  const router = useRouter();
+
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
   const [cookTime, setCookTime] = useState('');
@@ -31,6 +34,15 @@ export default function AddNewRecipePage() {
   const [isSubmit, setIsSubmit] = useState(false);
 
   const saveRecipe = async () => {
+    console.log(
+      'Saving recipe...:',
+      name,
+      description,
+      cookTime,
+      yieldCount,
+      ingredientsData,
+      instructionsData
+    );
     setIsSubmit(true);
 
     // Basic validation
@@ -42,7 +54,9 @@ export default function AddNewRecipePage() {
       ingredientsData.length === 0 ||
       instructionsData.length === 0
     ) {
-      setErrorMessage('Please fill in all fields and add at least one ingredient and instruction.');
+      setErrorMessage(
+        'Please fill in all fields and add at least one ingredient and instruction, and save.'
+      );
       return;
     }
 
@@ -67,6 +81,7 @@ export default function AddNewRecipePage() {
       const result = await response.json();
 
       console.log('Recipe saved successfully:', result);
+      router.push('/recipe'); // Redirect to recipe list
     } catch (error) {
       console.error('Error saving recipe:', error);
     }

@@ -132,6 +132,7 @@ const IngredientsSection = ({
                 <option value="g">g</option>
                 <option value="ml">ml</option>
                 <option value="pc">pc</option>
+                <option value="tsp">tsp</option>
               </select>
 
               {/* Delete Button (only when editing) */}
