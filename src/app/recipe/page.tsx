@@ -3,95 +3,35 @@
 import { Heart } from 'lucide-react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
+import { useEffect, useState } from 'react';
 import Header from '~/components/Header';
+import { Recipe } from '~/types/recipe';
 
 export default function RecipePage() {
-  const data = [
-    {
-      id: 1,
-      imageUrl: '/classic-ham-roll.jpg',
-      title: 'Classic Ham Roll Cheese Bread',
-      description:
-        'A soft, fluffy bread roll filled with savory ham and creamy melted cheese — a timeless bakery favorite.',
-      isFavorite: true,
-    },
-    {
-      id: 2,
-      imageUrl: '/classic-ham-roll.jpg',
-      title: 'Chocolate Chip Cookie',
-      description:
-        'Crispy on the edges, chewy in the center, and loaded with rich chocolate chips in every bite.',
-      isFavorite: true,
-    },
-    {
-      id: 3,
-      imageUrl: '/classic-ham-roll.jpg',
-      title: 'Fudgy Brownie Delight',
-      description:
-        'Dense and decadent chocolate brownie with a fudgy texture and a hint of espresso flavor.',
-      isFavorite: true,
-    },
-    {
-      id: 4,
-      imageUrl: '/classic-ham-roll.jpg',
-      title: 'Matcha Cream Bun',
-      description:
-        'A fluffy bun infused with premium Japanese matcha and filled with smooth matcha custard cream.',
-      isFavorite: true,
-    },
-    {
-      id: 5,
-      imageUrl: '/classic-ham-roll.jpg',
-      title: 'Buttery Croissant Supreme',
-      description:
-        'Flaky, golden-brown layers of pastry made with pure butter — perfect with your morning coffee.',
-      isFavorite: false,
-    },
-    {
-      id: 6,
-      imageUrl: '/classic-ham-roll.jpg',
-      title: 'Blueberry Burst Muffin',
-      description:
-        'A moist, bakery-style muffin bursting with real blueberries and topped with a sugary crumble.',
-      isFavorite: false,
-    },
-    {
-      id: 7,
-      imageUrl: '/classic-ham-roll.jpg',
-      title: 'Red Velvet Cream Cookie',
-      description:
-        'Soft red velvet cookies with a luscious cream cheese filling for a rich and tangy treat.',
-      isFavorite: false,
-    },
-    {
-      id: 8,
-      imageUrl: '/classic-ham-roll.jpg',
-      title: 'Moist Banana Loaf',
-      description:
-        'Classic banana bread made from ripe bananas and a touch of butter for the perfect moist crumb.',
-      isFavorite: false,
-    },
-    {
-      id: 9,
-      imageUrl: '/classic-ham-roll.jpg',
-      title: 'Oreo Crunch Brownie',
-      description:
-        'A chewy brownie base topped with crushed Oreos and drizzled with white chocolate.',
-      isFavorite: false,
-    },
-    {
-      id: 10,
-      imageUrl: '/classic-ham-roll.jpg',
-      title: 'Strawberry Danish Delight',
-      description:
-        'Flaky pastry filled with vanilla custard and topped with fresh strawberries and glaze.',
-      isFavorite: false,
-    },
-  ];
-
   const router = useRouter();
 
-  const favorites = data.filter((item) => item.isFavorite);
+  const [recipes, setRecipes] = useState<Recipe[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchRecipes = async () => {
+      try {
+        const res = await fetch('/api/recipe'); // GET route
+        const data = await res.json();
+        setRecipes(data);
+      } catch (error) {
+        console.error('Error fetching recipes:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchRecipes();
+  }, []);
+
+  if (loading) return <p>Loading recipes...</p>;
+
+  const favorites = recipes.filter((item) => item.is_favorite);
 
   return (
     <main className="min-h-screen">
@@ -120,7 +60,7 @@ export default function RecipePage() {
 
               {/* Favorite Button */}
               <div className="absolute top-2 right-2">
-                {item.isFavorite ? (
+                {item.is_favorite ? (
                   <Heart className="fill-accent" color="white" />
                 ) : (
                   <Heart className="fill-text-secondary" color="white" />
@@ -132,7 +72,7 @@ export default function RecipePage() {
 
               {/* Text */}
               <div className="absolute bottom-3 w-full p-2 text-center text-sm text-white">
-                {item.title}
+                {item.name}
               </div>
             </button>
           ))}
@@ -141,7 +81,7 @@ export default function RecipePage() {
         {/* All */}
         <h2 className="mt-8 mb-4 text-xl font-medium">All</h2>
         <div className="flex flex-wrap gap-4">
-          {data.map((item) => (
+          {recipes.map((item) => (
             <button
               key={item.id}
               type="button"
@@ -158,7 +98,7 @@ export default function RecipePage() {
 
               {/* Favorite Button */}
               <div className="absolute top-2 right-2">
-                {item.isFavorite ? (
+                {item.is_favorite ? (
                   <Heart className="fill-accent" color="white" />
                 ) : (
                   <Heart className="fill-text-secondary" color="white" />
@@ -170,7 +110,7 @@ export default function RecipePage() {
 
               {/* Text */}
               <div className="absolute bottom-3 w-full p-2 text-center text-sm text-white">
-                {item.title}
+                {item.name}
               </div>
             </button>
           ))}

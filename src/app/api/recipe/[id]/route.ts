@@ -1,0 +1,104 @@
+import { NextResponse } from 'next/server';
+import pool from '~/lib/db';
+
+export async function GET(_req: Request, context: { params: Promise<{ id: string }> }) {
+  const client = await pool.connect();
+
+  try {
+    const { id } = await context.params;
+    const recipeId = Number(id);
+    if (isNaN(recipeId)) {
+      return NextResponse.json({ error: 'Invalid recipe ID' }, { status: 400 });
+    }
+
+    // 🥘 Get the recipe
+    const recipeResult = await client.query(`SELECT * FROM recipe WHERE id = $1`, [recipeId]);
+
+    if (recipeResult.rows.length === 0) {
+      return NextResponse.json({ error: 'Recipe not found' }, { status: 404 });
+    }
+
+    const recipe = recipeResult.rows[0];
+
+    // 🧂 Get ingredients
+    const ingredientsResult = await client.query(`SELECT * FROM ingredients WHERE recipe_id = $1`, [
+      recipeId,
+    ]);
+
+    // 📜 Get instructions
+    const instructionsResult = await client.query(
+      `SELECT * FROM instruction WHERE recipe_id = $1`,
+      [recipeId]
+    );
+
+    const data = {
+      ...recipe,
+      ingredients: ingredientsResult.rows,
+      instruction: instructionsResult.rows,
+    };
+
+    return NextResponse.json(data);
+  } catch (error) {
+    console.error('GET /recipe/:id Error:', error);
+    return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
+  } finally {
+    client.release();
+  }
+}
+
+export async function PUT(req: Request, { params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params; // ✅ await params
+  const client = await pool.connect();
+
+  try {
+    const recipeId = Number(id);
+    if (isNaN(recipeId)) {
+      return NextResponse.json({ error: 'Invalid recipe ID' }, { status: 400 });
+    }
+
+    const body = await req.json();
+    const { name, description, is_favorite, ingredients, instruction } = body;
+
+    await client.query('BEGIN');
+
+    // Update main recipe
+    await client.query(
+      `UPDATE recipe
+       SET name = $1, description = $2, is_favorite = $3
+       WHERE id = $4`,
+      [name, description, is_favorite, recipeId]
+    );
+
+    // Delete old ingredients + instructions (optional if you want full overwrite)
+    await client.query('DELETE FROM ingredients WHERE recipe_id = $1', [recipeId]);
+    await client.query('DELETE FROM instruction WHERE recipe_id = $1', [recipeId]);
+
+    // Insert new ingredients
+    for (const ing of ingredients) {
+      await client.query(
+        `INSERT INTO ingredients (recipe_id, name, quantity, unit)
+         VALUES ($1, $2, $3, $4)`,
+        [recipeId, ing.name, ing.quantity, ing.unit]
+      );
+    }
+
+    // Insert new instructions
+    for (const step of instruction) {
+      await client.query(
+        `INSERT INTO instruction (recipe_id, title, description)
+         VALUES ($1, $2, $3)`,
+        [recipeId, step.title, step.description]
+      );
+    }
+
+    await client.query('COMMIT');
+
+    return NextResponse.json({ message: 'Recipe updated successfully!' });
+  } catch (error) {
+    await client.query('ROLLBACK');
+    console.error('PUT /recipe/[id] Error:', error);
+    return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
+  } finally {
+    client.release();
+  }
+}
