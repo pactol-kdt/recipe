@@ -41,7 +41,7 @@ export default function RecipePage() {
       {/* Content */}
       <section className="bg-bg-muted border-border-base flex min-h-[calc(874px-74px)] flex-col gap-8 border-t p-4">
         {/* Favorites */}
-        {favorites.length && (
+        {favorites.length > 0 && (
           <div>
             <h2 className="mb-4 text-xl font-medium">Favorites</h2>
             <div className="flex flex-wrap gap-4">
