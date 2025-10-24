@@ -1,9 +1,10 @@
 'use client';
 
-import { ArrowLeft, Clock3, Flame, Heart, List, TrendingUp } from 'lucide-react';
+import { ArrowLeft, Clock3, Flame, Heart, List, Trash2, TrendingUp } from 'lucide-react';
 import Image from 'next/image';
 import { useParams, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
+import { paths } from '~/meta';
 import { Recipe } from '~/types/recipe';
 
 export default function IngredientPage() {
@@ -20,7 +21,7 @@ export default function IngredientPage() {
   useEffect(() => {
     const fetchRecipes = async () => {
       try {
-        const res = await fetch(`/api/recipe/${id}`); // GET route
+        const res = await fetch(`/api/recipes/${id}`); // GET route
         const data = await res.json();
 
         console.log(data);
@@ -35,8 +36,28 @@ export default function IngredientPage() {
     if (id) fetchRecipes(); // only run when id is ready
   }, [id]);
 
+  const handleDelete = async (id: number) => {
+    try {
+      const res = await fetch(`/api/recipes/${id}`, {
+        method: 'DELETE',
+      });
+
+      const data = await res.json();
+
+      if (res.ok) {
+        alert('Recipe deleted successfully');
+        router.push(paths.RECIPE);
+      } else {
+        alert(`Failed: ${data.error}`);
+      }
+    } catch (err) {
+      console.error(err);
+      alert('Error deleting ingredients');
+    }
+  };
+
   async function updateRecipe(id: number, data: Recipe) {
-    const res = await fetch(`/api/recipe/${id}`, {
+    const res = await fetch(`/api/recipes/${id}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(data),
@@ -99,17 +120,27 @@ export default function IngredientPage() {
           <ArrowLeft />
         </button>
 
-        {/* Favorite Button */}
-        <button
-          className="absolute top-4 right-4 rounded-full bg-white p-2 active:scale-95"
-          onClick={handleFavorite}
-        >
-          {recipe?.is_favorite ? (
-            <Heart className="fill-accent" color="white" />
-          ) : (
-            <Heart className="" color="black" />
-          )}
-        </button>
+        <div className="absolute top-4 right-4 flex gap-4">
+          {/* Delete Button */}
+          <button
+            className="active:bg-bg-muted rounded-full bg-white p-2 active:scale-95"
+            onClick={() => handleDelete(recipe.id)}
+          >
+            <Trash2 className="" color="red" />
+          </button>
+
+          {/* Favorite Button */}
+          <button
+            className="active:bg-bg-muted rounded-full bg-white p-2 active:scale-95"
+            onClick={handleFavorite}
+          >
+            {recipe?.is_favorite ? (
+              <Heart className="fill-accent" color="white" />
+            ) : (
+              <Heart className="" color="black" />
+            )}
+          </button>
+        </div>
       </div>
 
       {/* CONTENT */}

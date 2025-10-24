@@ -7,6 +7,7 @@ import { useState } from 'react';
 import InstructionsSection from './_components/instruction';
 import ErrorLabel from '~/components/ErrorLabel';
 import { useRouter } from 'next/navigation';
+import { paths } from '~/meta';
 
 type Ingredient = {
   name: string;
@@ -61,7 +62,7 @@ export default function AddNewRecipePage() {
     }
 
     try {
-      const response = await fetch('/api/recipe', {
+      const response = await fetch('/api/recipes', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -81,21 +82,20 @@ export default function AddNewRecipePage() {
       const result = await response.json();
 
       console.log('Recipe saved successfully:', result);
-      router.push('/recipe'); // Redirect to recipe list
+      router.push(`${paths.RECIPE}`); // Redirect to recipe list
     } catch (error) {
       console.error('Error saving recipe:', error);
     }
   };
 
   return (
-    <main className="min-h-screen">
+    <main className="bg-bg-muted flex min-h-screen w-full flex-col items-center">
       {/* Header */}
-      <Header title="Add New Recipe" menuButton={false} backButton={true} />
+      <Header title="Add New Recipe" menuButtons={[]} backButton={true} />
 
       {/* Content */}
-      <section className="bg-bg-muted border-border-base flex min-h-[calc(874px-74px)] flex-col gap-4 border-t p-4 pb-8">
-        {/* Details */}
-        <div className="rounded-2xl bg-white p-4">
+      <section className="flex min-h-[calc(874px-74px)] w-full max-w-2xl flex-col items-center gap-8 p-4">
+        <div className="w-full rounded-2xl bg-white p-4">
           <h2 className="font-bold">DETAILS</h2>
 
           <div className="mt-4 flex flex-col gap-2">
@@ -107,7 +107,7 @@ export default function AddNewRecipePage() {
                 name="name"
                 id="name"
                 placeholder='e.g. "Classic Ham Roll Cheese Bread"'
-                className={`${isSubmit && name.length === 0 ? 'border-2 border-red-500' : 'border-border-base border'} rounded-lg border bg-white p-2 text-sm font-light`}
+                className={`${isSubmit && name.length === 0 ? 'border-2 border-red-500' : 'border-border-base border'} rounded-lg border bg-white p-2 text-sm font-light capitalize`}
                 value={name}
                 onChange={(e) => setName((e.target as HTMLInputElement).value)}
               />
@@ -204,7 +204,7 @@ export default function AddNewRecipePage() {
         />
 
         {/* Submit Button */}
-        <div className="flex flex-col justify-between gap-4">
+        <div className="flex w-full flex-col justify-between gap-4">
           <button
             type="button"
             className="bg-accent flex items-center justify-center gap-2 rounded-2xl p-2 font-bold text-white active:scale-95"

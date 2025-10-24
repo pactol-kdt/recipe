@@ -1,21 +1,21 @@
 'use client';
 
-import { ArrowLeft, EllipsisVertical, Plus } from 'lucide-react';
+import { ArrowLeft, EllipsisVertical } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 
 type HeaderProps = {
   title: string;
   backButton: boolean;
-  menuButton: boolean;
+  menuButtons: { icon: React.ReactElement; label: string; fn: () => void }[] | null;
 };
 
-const Header = ({ title, backButton, menuButton }: HeaderProps) => {
+const Header = ({ title, backButton, menuButtons }: HeaderProps) => {
   const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
 
   return (
-    <header className="relative flex h-[74px] items-center justify-between p-4">
+    <header className="border-border-base relative flex h-[74px] w-full items-center justify-between border-b bg-white p-4">
       {backButton ? (
         <button
           type="button"
@@ -30,7 +30,7 @@ const Header = ({ title, backButton, menuButton }: HeaderProps) => {
 
       <h1 className="text-xl">{title}</h1>
 
-      {menuButton ? (
+      {menuButtons?.length ? (
         <div className="">
           <button
             type="button"
@@ -41,12 +41,17 @@ const Header = ({ title, backButton, menuButton }: HeaderProps) => {
           </button>
 
           {isOpen && (
-            <button
-              className="border-border-base active:bg-bg-muted absolute right-4 flex w-fit gap-2 rounded-sm border bg-white p-2"
-              onClick={() => router.push('/recipe/add')}
-            >
-              <Plus /> <div>Add new recipe</div>
-            </button>
+            <div className="border-border-base absolute right-4 flex flex-col rounded-sm border bg-white">
+              {menuButtons.map((btn, idx) => (
+                <button
+                  key={idx}
+                  className={`active:bg-bg-muted flex w-full items-center gap-2 bg-white p-2 ${idx < menuButtons.length - 1 ? 'border-border-base border-b' : ''} `}
+                  onClick={btn.fn}
+                >
+                  {btn.icon} <div>{btn.label}</div>
+                </button>
+              ))}
+            </div>
           )}
         </div>
       ) : (

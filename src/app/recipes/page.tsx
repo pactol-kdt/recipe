@@ -1,10 +1,11 @@
 'use client';
 
-import { Heart } from 'lucide-react';
+import { Heart, Plus } from 'lucide-react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import Header from '~/components/Header';
+import { paths } from '~/meta';
 import { Recipe } from '~/types/recipe';
 
 export default function RecipePage() {
@@ -16,7 +17,7 @@ export default function RecipePage() {
   useEffect(() => {
     const fetchRecipes = async () => {
       try {
-        const res = await fetch('/api/recipe'); // GET route
+        const res = await fetch('/api/recipes'); // GET route
         const data = await res.json();
         setRecipes(data);
       } catch (error) {
@@ -34,23 +35,33 @@ export default function RecipePage() {
   const favorites = recipes.filter((item) => item.is_favorite);
 
   return (
-    <main className="min-h-screen">
+    <main className="bg-bg-muted flex min-h-screen w-full flex-col items-center">
       {/* Header */}
-      <Header title="Recipes" menuButton={true} backButton={false} />
+      <Header
+        title="Recipes"
+        menuButtons={[
+          {
+            icon: <Plus />,
+            label: 'Add Recipe',
+            fn: () => router.push(`${paths.RECIPE}${paths.ADD}`),
+          },
+        ]}
+        backButton={false}
+      />
 
       {/* Content */}
-      <section className="bg-bg-muted border-border-base flex min-h-[calc(874px-74px)] flex-col gap-8 border-t p-4">
+      <section className="flex min-h-[calc(874px-74px)] max-w-6xl flex-col items-center gap-8 p-4">
         {/* Favorites */}
         {favorites.length > 0 && (
           <div>
             <h2 className="mb-4 text-xl font-medium">Favorites</h2>
-            <div className="flex flex-wrap gap-4">
+            <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4">
               {favorites.map((item) => (
                 <button
                   key={item.id}
                   type="button"
                   className="relative h-[220px] w-[177px]"
-                  onClick={() => router.push(`/recipe/${item.id}`)}
+                  onClick={() => router.push(`${paths.RECIPE}/${item.id}`)}
                 >
                   {/* Image */}
                   <Image
@@ -85,14 +96,14 @@ export default function RecipePage() {
         {/* All */}
         <div>
           <h2 className="mb-4 text-xl font-medium">All</h2>
-          <div className="flex flex-wrap gap-4">
+          <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4">
             {recipes.length ? (
               recipes.map((item) => (
                 <button
                   key={item.id}
                   type="button"
                   className="relative h-[220px] w-[177px]"
-                  onClick={() => router.push(`/recipe/${item.id}`)}
+                  onClick={() => router.push(`/recipes/${item.id}`)}
                 >
                   {/* Image */}
                   <Image

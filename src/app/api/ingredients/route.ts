@@ -1,91 +1,105 @@
 import { NextResponse } from 'next/server';
 import pool from '~/lib/db';
-import type { QueryResultRow } from 'pg';
 
-// Define type for Ingredient rows
-interface Ingredient extends QueryResultRow {
-  id: number;
-  name: string;
-}
-
-// ✅ GET - fetch all ingredients
 export async function GET() {
+  const client = await pool.connect();
+
   try {
-    const result = await pool.query<Ingredient>('SELECT * FROM ingredients ORDER BY id ASC');
-    return NextResponse.json(result.rows, { status: 200 });
+    // 📦 Fetch all recipes
+    const recipeResult = await client.query(`SELECT * FROM ingredient_list ORDER BY id DESC`);
+    const recipes = recipeResult.rows;
+
+    return NextResponse.json(recipes);
   } catch (error) {
-    console.error('GET Error:', error);
-    return NextResponse.json({ error: 'Failed to fetch ingredients' }, { status: 500 });
+    console.error('GET /recipe Error:', error);
+    return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
+  } finally {
+    client.release();
   }
 }
 
-// ✅ POST - create a new ingredient
 export async function POST(req: Request) {
+  const client = await pool.connect();
+  const ingredients = await req.json();
+  console.log('Received ingredients:', ingredients);
   try {
-    const body = await req.json();
-    const { name } = body;
-
-    if (!name) {
-      return NextResponse.json({ error: 'Name is required' }, { status: 400 });
+    if (!Array.isArray(ingredients) || ingredients.length === 0) {
+      return NextResponse.json({ error: 'Ingredients must be a non-empty array' }, { status: 400 });
     }
 
-    const result = await pool.query<Ingredient>(
-      'INSERT INTO ingredients (name) VALUES ($1) RETURNING *',
-      [name]
-    );
+    await client.query('BEGIN');
 
-    return NextResponse.json(result.rows[0], { status: 201 });
-  } catch (error) {
-    console.error('POST Error:', error);
-    return NextResponse.json({ error: 'Failed to create ingredient' }, { status: 500 });
+    const insertedIngredients = [];
+
+    for (const ing of ingredients) {
+      const { name, quantity, minimum_required, unit } = ing;
+
+      if (!name || quantity == null || !unit || minimum_required == null) {
+        throw new Error('Missing required fields');
+      }
+
+      const result = await client.query(
+        `INSERT INTO ingredient_list (name, quantity, minimum_required, unit)
+          VALUES ($1, $2, $3, $4)
+          ON CONFLICT (name)
+          DO UPDATE SET
+            quantity = EXCLUDED.quantity,
+            minimum_required = EXCLUDED.minimum_required,
+            unit = EXCLUDED.unit
+          RETURNING *`,
+        [name, quantity, minimum_required, unit]
+      );
+
+      insertedIngredients.push(result.rows[0]);
+    }
+
+    await client.query('COMMIT');
+
+    return NextResponse.json(
+      { message: 'Ingredients saved successfully', ingredients: insertedIngredients },
+      { status: 201 }
+    );
+  } catch (err) {
+    await client.query('ROLLBACK');
+    console.error('Transaction failed:', err);
+    return NextResponse.json({ error: 'Failed to insert ingredients' }, { status: 500 });
+  } finally {
+    client.release();
   }
 }
 
-// ✅ PUT - update an ingredient
-export async function PUT(req: Request) {
-  try {
-    const body = await req.json();
-    const { id, name } = body;
-
-    if (!id || !name) {
-      return NextResponse.json({ error: 'ID and Name are required' }, { status: 400 });
-    }
-
-    const result = await pool.query<Ingredient>(
-      'UPDATE ingredients SET name = $1 WHERE id = $2 RETURNING *',
-      [name, id]
-    );
-
-    if (result.rows.length === 0) {
-      return NextResponse.json({ error: 'Ingredient not found' }, { status: 404 });
-    }
-
-    return NextResponse.json(result.rows[0], { status: 200 });
-  } catch (error) {
-    console.error('PUT Error:', error);
-    return NextResponse.json({ error: 'Failed to update ingredient' }, { status: 500 });
-  }
-}
-
-// ✅ DELETE - delete an ingredient
 export async function DELETE(req: Request) {
+  const client = await pool.connect();
+
   try {
-    const { searchParams } = new URL(req.url);
-    const id = searchParams.get('id');
+    const { ids } = await req.json(); // array of ingredient names to delete
 
-    if (!id) {
-      return NextResponse.json({ error: 'ID is required' }, { status: 400 });
+    if (!Array.isArray(ids) || ids.length === 0) {
+      return NextResponse.json({ error: 'No ingredient names provided' }, { status: 400 });
     }
 
-    const result = await pool.query('DELETE FROM ingredients WHERE id = $1 RETURNING *', [id]);
+    await client.query('BEGIN');
 
-    if (result.rows.length === 0) {
-      return NextResponse.json({ error: 'Ingredient not found' }, { status: 404 });
-    }
+    // Use ANY($1) to delete multiple entries in one query
+    const result = await client.query(
+      'DELETE FROM ingredient_list WHERE id = ANY($1) RETURNING *',
+      [ids]
+    );
 
-    return NextResponse.json({ message: 'Deleted successfully' }, { status: 200 });
-  } catch (error) {
-    console.error('DELETE Error:', error);
-    return NextResponse.json({ error: 'Failed to delete ingredient' }, { status: 500 });
+    await client.query('COMMIT');
+
+    return NextResponse.json(
+      {
+        message: 'Ingredients deleted successfully',
+        deleted: result.rows,
+      },
+      { status: 200 }
+    );
+  } catch (err) {
+    await client.query('ROLLBACK');
+    console.error('Delete failed:', err);
+    return NextResponse.json({ error: 'Failed to delete ingredients' }, { status: 500 });
+  } finally {
+    client.release();
   }
 }

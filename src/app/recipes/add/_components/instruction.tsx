@@ -54,7 +54,7 @@ const InstructionsSection = ({
   const hasEmptyFields = items.some((item) => !item.description.trim() || !item.title.trim());
 
   return (
-    <div className="rounded-2xl bg-white p-6">
+    <div className="w-full rounded-2xl bg-white p-6">
       {/* Header */}
       <div className="mb-4 flex items-center justify-between">
         <h2 className="text-lg font-semibold text-gray-900">INSTRUCTION</h2>
@@ -99,7 +99,7 @@ const InstructionsSection = ({
                   defaultValue={item.title}
                   readOnly={!isEditing}
                   placeholder='e.g. "Prepare dry ingredients"'
-                  className={`w-full rounded-lg border px-3 py-2 text-sm text-gray-900 placeholder-gray-400 focus:outline-none ${
+                  className={`w-full rounded-lg border px-3 py-2 text-sm text-gray-900 capitalize placeholder-gray-400 focus:outline-none ${
                     isEditing
                       ? 'border-gray-300 bg-white focus:border-gray-400'
                       : 'border-transparent bg-transparent'

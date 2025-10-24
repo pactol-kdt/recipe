@@ -102,3 +102,43 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
     client.release();
   }
 }
+
+export async function DELETE(req: Request, { params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params; // ✅ await params
+
+  const client = await pool.connect();
+
+  try {
+    const recipeId = Number(id);
+
+    if (isNaN(recipeId)) {
+      return NextResponse.json({ error: 'Invalid recipe ID' }, { status: 400 });
+    }
+
+    await client.query('BEGIN');
+
+    // Delete from related tables first
+    await client.query('DELETE FROM ingredients WHERE recipe_id = $1', [recipeId]);
+    await client.query('DELETE FROM instruction WHERE recipe_id = $1', [recipeId]);
+
+    // Finally, delete the recipe itself
+    const result = await client.query('DELETE FROM recipe WHERE id = $1 RETURNING *', [recipeId]);
+
+    if (result.rowCount === 0) {
+      throw new Error('Recipe not found');
+    }
+
+    await client.query('COMMIT');
+
+    return NextResponse.json({
+      message: 'Recipe and related data deleted successfully',
+      deletedRecipe: result.rows[0],
+    });
+  } catch (err) {
+    await client.query('ROLLBACK');
+    console.error('Delete failed:', err);
+    return NextResponse.json({ error: 'Failed to delete recipe' }, { status: 500 });
+  } finally {
+    client.release();
+  }
+}
