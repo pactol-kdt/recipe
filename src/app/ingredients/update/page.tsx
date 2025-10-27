@@ -1,8 +1,10 @@
 'use client';
 
 import { Check, Pencil, Plus, Save, Trash2 } from 'lucide-react';
-import { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { useEffect, useState } from 'react';
 import Header from '~/components/Header';
+import { paths } from '~/meta';
 
 type IngredientList = {
   name: string;
@@ -12,6 +14,31 @@ type IngredientList = {
 };
 
 const UpdateIngredientsPage = () => {
+  const router = useRouter();
+
+  const [ingredients, setIngredients] = useState<IngredientList[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  const [isEditing, setIsEditing] = useState(false);
+  const [items, setItems] = useState<IngredientList[]>([]);
+
+  useEffect(() => {
+    const fetchIngredients = async () => {
+      try {
+        const res = await fetch('/api/ingredients'); // GET route
+        const data = await res.json();
+        setIngredients(data);
+        console.log('Fetched ingredients:', data);
+      } catch (error) {
+        console.error('Error fetching ingredients:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchIngredients();
+  }, []);
+
   const saveRecipe = async () => {
     console.log('Saving recipe...:', items);
 
@@ -29,30 +56,10 @@ const UpdateIngredientsPage = () => {
       const result = await response.json();
 
       console.log('Recipe saved successfully:', result);
-      // router.push(`${paths.RECIPE}`); // Redirect to recipe list
+      router.push(`${paths.INGREDIENT}`); // Redirect to recipe list
     } catch (error) {
       console.error('Error saving recipe:', error);
     }
-  };
-
-  const [isEditing, setIsEditing] = useState(false);
-  const [items, setItems] = useState<IngredientList[]>([]);
-
-  // useEffect(() => {
-  //   setItems(ingredients);
-  // }, [ingredients]);
-
-  const handleRemove = (index: number) => {
-    setItems((prev) => prev.filter((_, i) => i !== index));
-  };
-
-  const handleSave = () => {
-    const hasEmpty = items?.some((item) => !item.name.trim() || !item.unit.trim());
-
-    if (hasEmpty) return;
-
-    setIsEditing(false);
-    console.log(items);
   };
 
   const handleAdd = () => {
@@ -71,8 +78,22 @@ const UpdateIngredientsPage = () => {
     setItems((prev) => prev.map((item, i) => (i === index ? { ...item, [field]: value } : item)));
   };
 
+  const handleRemove = (index: number) => {
+    setItems((prev) => prev.filter((_, i) => i !== index));
+  };
+
+  const handleSave = () => {
+    const hasEmpty = items?.some((item) => !item.name.trim() || !item.unit.trim());
+
+    if (hasEmpty) return;
+
+    setIsEditing(false);
+    console.log(items);
+  };
+
   const hasEmptyFields = items?.some((item) => !item.name.trim() || !item.unit.trim());
 
+  if (loading) return <p>Loading ingredients...</p>;
   return (
     <main className="bg-bg-muted flex min-h-screen w-full flex-col items-center">
       {/* Header */}
@@ -126,6 +147,7 @@ const UpdateIngredientsPage = () => {
               {items?.map((item, index) => (
                 <div key={index} className="col-span-12 grid grid-cols-12 items-center gap-2">
                   <input
+                    list="ingredients"
                     type="text"
                     name="ingredient-name"
                     id="ingredient-name"
@@ -134,6 +156,12 @@ const UpdateIngredientsPage = () => {
                     onChange={(e) => handleChange(index, 'name', e.target.value)}
                     className="border-border-base col-span-5 rounded-lg border bg-white p-2 text-sm font-light capitalize"
                   />
+
+                  <datalist id="ingredients">
+                    {ingredients.map((ingredient, idx) => (
+                      <option key={idx} value={ingredient.name} />
+                    ))}
+                  </datalist>
 
                   <input
                     type="number"

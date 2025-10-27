@@ -40,11 +40,6 @@ export default function IngredientsPage() {
     fetchIngredients();
   }, []);
 
-  // To see the updated array, use useEffect:
-  useEffect(() => {
-    console.log(selectedIngredients); // this will log the updated IDs array
-  }, [selectedIngredients]);
-
   const handleDelete = async () => {
     if (selectedIngredients.length === 0) return;
 
@@ -109,9 +104,9 @@ export default function IngredientsPage() {
           <h2 className="sticky top-0 mb-4 text-xl font-medium">Restock Needed</h2>
 
           {lowStocks.length ? (
-            <div className="flex w-full flex-col gap-2 rounded-2xl bg-white p-4">
+            <div className="flex w-full flex-col gap-2 rounded-2xl">
               {lowStocks.map((item, idx) => (
-                <div key={idx} className="flex justify-between">
+                <div key={idx} className="flex justify-between rounded-md bg-white p-2">
                   <div>{item.name}</div>
                   <div className="text-text-secondary font-light">
                     {item.quantity} {item.unit}
@@ -126,10 +121,13 @@ export default function IngredientsPage() {
 
         <div className="w-full">
           <h2 className="mb-4 text-xl font-medium">All ingredients</h2>
-          <div className="flex w-full flex-col gap-2 rounded-2xl bg-white p-4">
+          <div className="rounded-2xlp-4 flex w-full flex-col gap-2">
             {ingredients.length ? (
               ingredients.map((item) => (
-                <div key={item.id} className="flex items-center justify-between">
+                <div
+                  key={item.id}
+                  className="flex items-center justify-between rounded-md bg-white p-2"
+                >
                   <div className="flex items-center gap-2">
                     {/* Quantity indicator */}
                     {!isEditing && (
