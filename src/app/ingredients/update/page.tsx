@@ -4,6 +4,7 @@ import { Check, Pencil, Plus, Save, Trash2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import Header from '~/components/Header';
+import HeartLoader from '~/components/Loader';
 import { paths } from '~/meta';
 
 type IngredientList = {
@@ -93,7 +94,7 @@ const UpdateIngredientsPage = () => {
 
   const hasEmptyFields = items?.some((item) => !item.name.trim() || !item.unit.trim());
 
-  if (loading) return <p>Loading ingredients...</p>;
+  if (loading) return <HeartLoader />;
   return (
     <main className="bg-bg-muted flex min-h-screen w-full flex-col items-center">
       {/* Header */}

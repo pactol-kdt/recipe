@@ -13,9 +13,14 @@ export const logo = {
 };
 
 export const paths = {
+  // PAGES
   RECIPE: '/recipes',
   INGREDIENT: '/ingredients',
 
+  // CRUD
   ADD: '/add',
   UPDATE: '/update',
+
+  // ERROR
+  NOT_FOUND: '/not-found',
 } as const;

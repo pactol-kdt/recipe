@@ -5,6 +5,7 @@ import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import Header from '~/components/Header';
+import HeartLoader from '~/components/Loader';
 import { paths } from '~/meta';
 import { Recipe } from '~/types/recipe';
 
@@ -30,7 +31,7 @@ export default function RecipePage() {
     fetchRecipes();
   }, []);
 
-  if (loading) return <p>Loading recipes...</p>;
+  if (loading) return <HeartLoader />;
 
   const favorites = recipes.filter((item) => item.is_favorite);
 

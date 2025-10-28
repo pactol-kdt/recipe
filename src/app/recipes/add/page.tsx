@@ -3,11 +3,13 @@
 import Header from '~/components/Header';
 import { Save } from 'lucide-react';
 import IngredientsSection from './_components/ingredients';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import InstructionsSection from './_components/instruction';
 import ErrorLabel from '~/components/ErrorLabel';
 import { useRouter } from 'next/navigation';
 import { paths } from '~/meta';
+import { IngredientList } from '~/app/ingredients/page';
+import HeartLoader from '~/components/Loader';
 
 type Ingredient = {
   name: string;
@@ -33,6 +35,26 @@ export default function AddNewRecipePage() {
 
   const [errorMessage, setErrorMessage] = useState('');
   const [isSubmit, setIsSubmit] = useState(false);
+
+  const [ingredientList, setIngredientList] = useState<IngredientList[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchIngredients = async () => {
+      try {
+        const res = await fetch('/api/ingredients'); // GET route
+        const data = await res.json();
+        setIngredientList(data);
+        console.log('Fetched ingredients:', data);
+      } catch (error) {
+        console.error('Error fetching ingredients:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchIngredients();
+  }, []);
 
   const saveRecipe = async () => {
     console.log(
@@ -87,6 +109,8 @@ export default function AddNewRecipePage() {
       console.error('Error saving recipe:', error);
     }
   };
+
+  if (loading) return <HeartLoader />;
 
   return (
     <main className="bg-bg-muted flex min-h-screen w-full flex-col items-center">
@@ -194,6 +218,7 @@ export default function AddNewRecipePage() {
           ingredients={ingredientsData}
           setIngredients={setIngredientsData}
           isSubmit={isSubmit}
+          ingredientList={ingredientList}
         />
 
         {/* INSTRUCTION */}

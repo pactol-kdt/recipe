@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import HeartLoader from '~/components/Loader';
 
 interface Ingredient {
   id: number;
@@ -61,6 +62,8 @@ export default function IngredientsPage() {
     await fetch(`/api/ingredients?id=${id}`, { method: 'DELETE' });
     fetchIngredients();
   };
+
+  if (loading) return <HeartLoader />;
 
   return (
     <div className="mx-auto mt-10 w-full max-w-md rounded-2xl border bg-white p-6 shadow">

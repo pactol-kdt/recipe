@@ -4,6 +4,7 @@ import { Check, Pencil, Plus, Trash2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import Header from '~/components/Header';
+import HeartLoader from '~/components/Loader';
 import { paths } from '~/meta';
 
 export type IngredientList = {
@@ -68,7 +69,7 @@ export default function IngredientsPage() {
     }
   };
 
-  if (loading) return <p>Loading ingredients...</p>;
+  if (loading) return <HeartLoader />;
 
   const toggleCheck = (id: number) => {
     setSelectedIngredients((prev) =>

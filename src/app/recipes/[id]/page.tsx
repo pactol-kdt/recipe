@@ -4,6 +4,7 @@ import { ArrowLeft, Clock3, Flame, Heart, List, Trash2, TrendingUp } from 'lucid
 import Image from 'next/image';
 import { useParams, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
+import HeartLoader from '~/components/Loader';
 import { paths } from '~/meta';
 import { Recipe } from '~/types/recipe';
 
@@ -12,7 +13,7 @@ export default function IngredientPage() {
   const id = Number(params.id); // convert to number for safety
   const router = useRouter();
 
-  const [recipe, setRecipe] = useState<Recipe | null>(null);
+  const [recipe, setRecipe] = useState<Recipe>({} as Recipe);
   const [loading, setLoading] = useState(true);
 
   const [tab, setTab] = useState<'ingredients' | 'instruction'>('ingredients');
@@ -96,9 +97,11 @@ export default function IngredientPage() {
     }
   };
 
-  if (loading) return <p>Loading recipe...</p>;
-  if (!recipe) return <p>Recipe not found.</p>;
-
+  if (loading) return <HeartLoader />;
+  if (recipe.error) {
+    router.push(paths.RECIPE);
+    return null;
+  }
   return (
     <main>
       {/* IMAGE */}
@@ -197,7 +200,7 @@ export default function IngredientPage() {
           {/* INGREDIENTS */}
           {tab === 'ingredients' && (
             <div className="flex flex-col gap-2 rounded-2xl bg-white p-4">
-              {recipe.ingredients.map((ingredient, idx) => (
+              {recipe.ingredients?.map((ingredient, idx) => (
                 <div key={idx} className="flex justify-between">
                   <div>{ingredient.name}</div>
                   <div className="text-text-secondary font-light">
@@ -211,7 +214,7 @@ export default function IngredientPage() {
           {/* INSTRUCTION */}
           {tab === 'instruction' && (
             <div className="flex flex-col gap-6 rounded-2xl bg-white p-4">
-              {recipe.instruction.map((item, idx) => (
+              {recipe.instruction?.map((item, idx) => (
                 <div key={idx} className="relative grid grid-cols-12 gap-4">
                   {/* Number with vertical line */}
                   <div className="relative col-span-1 flex justify-center">

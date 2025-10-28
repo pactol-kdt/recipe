@@ -12,33 +12,15 @@ const IngredientsSection = ({
   ingredients,
   setIngredients,
   isSubmit,
+  ingredientList,
 }: {
   ingredients: Ingredient[];
   setIngredients: (value: Ingredient[]) => void;
   isSubmit: boolean;
+  ingredientList: IngredientList[];
 }) => {
-  const [ingredientList, setIngredientList] = useState<IngredientList[]>([]);
-  const [loading, setLoading] = useState(true);
-
   const [isEditing, setIsEditing] = useState(false);
   const [items, setItems] = useState(ingredients);
-
-  useEffect(() => {
-    const fetchIngredients = async () => {
-      try {
-        const res = await fetch('/api/ingredients'); // GET route
-        const data = await res.json();
-        setIngredientList(data);
-        console.log('Fetched ingredients:', data);
-      } catch (error) {
-        console.error('Error fetching ingredients:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchIngredients();
-  }, []);
 
   useEffect(() => {
     setItems(ingredients);
@@ -79,7 +61,6 @@ const IngredientsSection = ({
     (item) => !item.name.trim() || !item.quantity.trim() || !item.unit.trim()
   );
 
-  if (loading) return <p>Loading ingredients...</p>;
   return (
     <div className="w-full rounded-2xl bg-white p-4">
       {/* Header */}
@@ -125,60 +106,78 @@ const IngredientsSection = ({
             Unit
           </label>
 
-          {items.map((item, index) => (
-            <div key={index} className="col-span-12 grid grid-cols-12 items-center gap-2">
-              <span className="col-span-1 flex h-6 w-6 items-center justify-center rounded-full bg-gray-100 text-sm font-medium text-gray-700">
-                {index + 1}
-              </span>
-              <select
-                name="ingredient-name"
-                id="ingredient-name"
-                disabled={!isEditing}
-                onChange={(e) => handleChange(index, 'name', e.target.value)}
-                className="border-border-base col-span-5 rounded-lg border bg-white p-2 text-sm font-light capitalize"
-              >
-                {ingredientList.map((ingredient) => (
-                  <option key={ingredient.id} value={ingredient.name}>
-                    {ingredient.name}
-                  </option>
-                ))}
-              </select>
+          {items.map((item, index) => {
+            // collect all selected names
+            const selectedNames = items.map((i) => i.name);
 
-              <input
-                type="number"
-                name="ingredient-quantity"
-                id="ingredient-quantity"
-                placeholder="200"
-                disabled={!isEditing}
-                onChange={(e) => handleChange(index, 'quantity', e.target.value)}
-                className="border-border-base col-span-3 rounded-lg border bg-white p-2 text-sm font-light"
-              />
+            return (
+              <div key={index} className="col-span-12 grid grid-cols-12 items-center gap-2">
+                <span className="col-span-1 flex h-6 w-6 items-center justify-center rounded-full bg-gray-100 text-sm font-medium text-gray-700">
+                  {index + 1}
+                </span>
 
-              <select
-                name="ingredient-unit"
-                id="ingredient-unit"
-                disabled={!isEditing}
-                onChange={(e) => handleChange(index, 'unit', e.target.value)}
-                className="border-border-base col-span-3 rounded-lg border bg-white p-2 text-sm font-light"
-              >
-                <option value="g">g</option>
-                <option value="ml">ml</option>
-                <option value="pc">pc</option>
-                <option value="tsp">tsp</option>
-              </select>
-
-              {/* Delete Button (only when editing) */}
-              {isEditing && (
-                <button
-                  type="button"
-                  onClick={() => handleRemove(index)}
-                  className="col-span-12 flex items-center justify-center gap-4 rounded-sm border border-red-500 p-2 text-red-500"
+                {/* Ingredient name dropdown */}
+                <select
+                  name="ingredient-name"
+                  id={`ingredient-name-${index}`}
+                  disabled={!isEditing}
+                  value={item.name}
+                  onChange={(e) => handleChange(index, 'name', e.target.value)}
+                  className="border-border-base col-span-5 rounded-lg border bg-white p-2 text-sm font-light capitalize"
                 >
-                  <Trash2 size={18} /> Delete
-                </button>
-              )}
-            </div>
-          ))}
+                  <option value="">Select ingredient</option>
+                  {ingredientList
+                    .filter(
+                      (ingredient) =>
+                        // show ingredient if it's not selected anywhere else
+                        !selectedNames.includes(ingredient.name) || ingredient.name === item.name // keep current selection visible
+                    )
+                    .map((ingredient) => (
+                      <option key={ingredient.id} value={ingredient.name}>
+                        {ingredient.name}
+                      </option>
+                    ))}
+                </select>
+
+                {/* Quantity */}
+                <input
+                  type="number"
+                  name="ingredient-quantity"
+                  id={`ingredient-quantity-${index}`}
+                  placeholder="200"
+                  disabled={!isEditing}
+                  value={item.quantity}
+                  onChange={(e) => handleChange(index, 'quantity', e.target.value)}
+                  className="border-border-base col-span-3 rounded-lg border bg-white p-2 text-sm font-light"
+                />
+
+                {/* Unit */}
+                <select
+                  name="ingredient-unit"
+                  id={`ingredient-unit-${index}`}
+                  disabled={!isEditing}
+                  value={item.unit}
+                  onChange={(e) => handleChange(index, 'unit', e.target.value)}
+                  className="border-border-base col-span-3 rounded-lg border bg-white p-2 text-sm font-light"
+                >
+                  <option value="g">g</option>
+                  <option value="ml">ml</option>
+                  <option value="pc">pc</option>
+                  <option value="tsp">tsp</option>
+                </select>
+
+                {isEditing && (
+                  <button
+                    type="button"
+                    onClick={() => handleRemove(index)}
+                    className="col-span-12 flex items-center justify-center gap-4 rounded-sm border border-red-500 p-2 text-red-500"
+                  >
+                    <Trash2 size={18} /> Delete
+                  </button>
+                )}
+              </div>
+            );
+          })}
         </div>
       )}
 
