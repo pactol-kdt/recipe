@@ -1,21 +1,31 @@
-import Image from 'next/image';
-import { redirect } from 'next/navigation';
-import { paths } from '~/meta';
+import { auth, signIn, signOut } from '../auth';
 
-export default function Home() {
-  redirect(`${paths.RECIPE}`);
+export default async function SignIn() {
+  const session = await auth();
+
   return (
-    <main className="bg-primary flex min-h-screen flex-col items-center justify-between p-24">
-      <div className="z-10 w-full max-w-5xl items-center justify-between font-mono text-sm lg:flex">
-        <Image
-          className="relative dark:drop-shadow-[0_0_0.3rem_#ffffff70] dark:invert"
-          src="/next.svg"
-          alt="Next.js Logo"
-          width={180}
-          height={37}
-          priority
-        />
-      </div>
+    <main>
+      {!session?.user && (
+        <form
+          action={async () => {
+            'use server';
+            await signIn('github');
+          }}
+        >
+          <button type="submit">Signin with GitHub</button>
+        </form>
+      )}
+
+      {session?.user && (
+        <form
+          action={async () => {
+            'use server';
+            await signOut({ redirectTo: '/auth' });
+          }}
+        >
+          <button type="submit">Sign Out</button>
+        </form>
+      )}
     </main>
   );
 }
