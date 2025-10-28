@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { auth } from '~/auth';
 import pool from '~/lib/db';
 
 interface Ingredient {
@@ -12,7 +13,11 @@ interface Instruction {
   description: string;
 }
 
-export async function POST(req: Request) {
+export const POST = auth(async function POST(req) {
+  if (!req.auth) {
+    return NextResponse.json({ message: 'Not authenticated' }, { status: 401 });
+  }
+
   const client = await pool.connect();
 
   try {
@@ -99,8 +104,13 @@ export async function POST(req: Request) {
   } finally {
     client.release();
   }
-}
-export async function GET() {
+});
+
+export const GET = auth(async function GET(req) {
+  if (!req.auth) {
+    return NextResponse.json({ message: 'Not authenticated' }, { status: 401 });
+  }
+
   const client = await pool.connect();
 
   try {
@@ -130,4 +140,4 @@ export async function GET() {
   } finally {
     client.release();
   }
-}
+});

@@ -1,7 +1,12 @@
 import { NextResponse } from 'next/server';
+import { auth } from '~/auth';
 import pool from '~/lib/db';
 
-export async function GET() {
+export const GET = auth(async function GET(req) {
+  if (!req.auth) {
+    return NextResponse.json({ message: 'Not authenticated' }, { status: 401 });
+  }
+
   const client = await pool.connect();
 
   try {
@@ -16,9 +21,13 @@ export async function GET() {
   } finally {
     client.release();
   }
-}
+});
 
-export async function POST(req: Request) {
+export const POST = auth(async function POST(req) {
+  if (!req.auth) {
+    return NextResponse.json({ message: 'Not authenticated' }, { status: 401 });
+  }
+
   const client = await pool.connect();
   const ingredients = await req.json();
   console.log('Received ingredients:', ingredients);
@@ -66,16 +75,19 @@ export async function POST(req: Request) {
   } finally {
     client.release();
   }
-}
+});
 
-export async function DELETE(req: Request) {
+export const DELETE = auth(async function DELETE(req) {
+  if (!req.auth) {
+    return NextResponse.json({ message: 'Not authenticated' }, { status: 401 });
+  }
   const client = await pool.connect();
 
   try {
     const { ids } = await req.json(); // array of ingredient names to delete
 
     if (!Array.isArray(ids) || ids.length === 0) {
-      return NextResponse.json({ error: 'No ingredient names provided' }, { status: 400 });
+      return NextResponse.json({ error: 'No ingredient ids provided' }, { status: 400 });
     }
 
     await client.query('BEGIN');
@@ -102,4 +114,4 @@ export async function DELETE(req: Request) {
   } finally {
     client.release();
   }
-}
+});

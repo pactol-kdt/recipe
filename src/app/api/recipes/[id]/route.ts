@@ -1,7 +1,12 @@
 import { NextResponse } from 'next/server';
+import { auth } from '~/auth';
 import pool from '~/lib/db';
 
-export async function GET(_req: Request, context: { params: Promise<{ id: string }> }) {
+export const GET = auth(async function GET(req, context: { params: Promise<{ id: string }> }) {
+  if (!req.auth) {
+    return NextResponse.json({ message: 'Not authenticated' }, { status: 401 });
+  }
+
   const client = await pool.connect();
 
   try {
@@ -44,9 +49,13 @@ export async function GET(_req: Request, context: { params: Promise<{ id: string
   } finally {
     client.release();
   }
-}
+});
 
-export async function PUT(req: Request, { params }: { params: Promise<{ id: string }> }) {
+export const PUT = auth(async function PUT(req, { params }: { params: Promise<{ id: string }> }) {
+  if (!req.auth) {
+    return NextResponse.json({ message: 'Not authenticated' }, { status: 401 });
+  }
+
   const { id } = await params; // ✅ await params
   const client = await pool.connect();
 
@@ -101,11 +110,17 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
   } finally {
     client.release();
   }
-}
+});
 
-export async function DELETE(req: Request, { params }: { params: Promise<{ id: string }> }) {
+export const DELETE = auth(async function DELETE(
+  req,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  if (!req.auth) {
+    return NextResponse.json({ message: 'Not authenticated' }, { status: 401 });
+  }
+
   const { id } = await params; // ✅ await params
-
   const client = await pool.connect();
 
   try {
@@ -141,4 +156,4 @@ export async function DELETE(req: Request, { params }: { params: Promise<{ id: s
   } finally {
     client.release();
   }
-}
+});
