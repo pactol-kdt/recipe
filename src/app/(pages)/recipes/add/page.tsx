@@ -8,7 +8,7 @@ import InstructionsSection from './_components/instruction';
 import ErrorLabel from '~/components/ErrorLabel';
 import { useRouter } from 'next/navigation';
 import { paths } from '~/meta';
-import { IngredientList } from '~/app/ingredients/page';
+import { IngredientList } from '~/app/(pages)/ingredients/page';
 import HeartLoader from '~/components/Loader';
 
 type Ingredient = {

@@ -1,6 +1,6 @@
 'use client';
 
-import { Check, Pencil, Plus, Trash2 } from 'lucide-react';
+import { Box, Check, History, Pencil, RefreshCw, Trash2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import Header from '~/components/Header';
@@ -86,7 +86,12 @@ export default function IngredientsPage() {
         title="Ingredients"
         menuButtons={[
           {
-            icon: <Plus />,
+            icon: <Box />,
+            label: 'Restock Ingredient',
+            fn: () => router.push(`${paths.INGREDIENT}${paths.ADD}`),
+          },
+          {
+            icon: <RefreshCw />,
             label: 'Update Ingredient',
             fn: () => router.push(`${paths.INGREDIENT}${paths.UPDATE}`),
           },
@@ -94,6 +99,11 @@ export default function IngredientsPage() {
             icon: isEditing ? <Check /> : <Pencil />,
             label: isEditing ? 'Done' : 'Edit',
             fn: () => setIsEditing(!isEditing),
+          },
+          {
+            icon: <History />,
+            label: 'Log',
+            fn: () => router.push(`${paths.INGREDIENT}${paths.LOG}`),
           },
         ]}
         backButton={false}

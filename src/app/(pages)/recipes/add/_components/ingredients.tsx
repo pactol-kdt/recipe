@@ -1,6 +1,6 @@
 import { Check, Pencil, Plus, Trash2 } from 'lucide-react';
 import { useEffect, useState } from 'react';
-import { IngredientList } from '~/app/ingredients/page';
+import { IngredientList } from '~/app/(pages)/ingredients/page';
 
 type Ingredient = {
   name: string;

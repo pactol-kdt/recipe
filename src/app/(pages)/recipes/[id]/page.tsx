@@ -1,6 +1,17 @@
 'use client';
 
-import { ArrowLeft, Clock3, Flame, Heart, List, Trash2, TrendingUp } from 'lucide-react';
+import {
+  ArrowLeft,
+  Check,
+  Clock3,
+  Flame,
+  Heart,
+  List,
+  LoaderCircle,
+  Microwave,
+  Trash2,
+  TrendingUp,
+} from 'lucide-react';
 import Image from 'next/image';
 import { useParams, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
@@ -15,6 +26,8 @@ export default function IngredientPage() {
 
   const [recipe, setRecipe] = useState<Recipe>({} as Recipe);
   const [loading, setLoading] = useState(true);
+  const [updateLoading, setUpdateLoading] = useState(false);
+  const [isMaking, setIsMaking] = useState(false);
 
   const [tab, setTab] = useState<'ingredients' | 'instruction'>('ingredients');
   const [batchCount, setBatchCount] = useState(1);
@@ -71,6 +84,30 @@ export default function IngredientPage() {
     return res.json();
   }
 
+  const makeRecipe = async () => {
+    console.log('Making recipe with batch count:', batchCount, id);
+    setUpdateLoading(true);
+
+    try {
+      const res = await fetch(`/api/ingredients`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'deductIngredients', batchCount, id }),
+      });
+
+      if (!res.ok) {
+        throw new Error('Failed to update ingredients');
+      }
+      setIsMaking(false);
+
+      return res.json();
+    } catch (error) {
+      console.error('Error fetching recipes:', error);
+    } finally {
+      setUpdateLoading(false);
+    }
+  };
+
   const handleTabs = (tabName: 'ingredients' | 'instruction') => {
     setTab(tabName);
   };
@@ -95,6 +132,10 @@ export default function IngredientPage() {
     } catch (error) {
       console.error('Error updating favorite:', error);
     }
+  };
+
+  const toggleMaking = () => {
+    setIsMaking(!isMaking);
   };
 
   if (loading) return <HeartLoader />;
@@ -155,10 +196,10 @@ export default function IngredientPage() {
 
             <div className="text-text-secondary mt-4 flex gap-4 font-light">
               <div className="flex gap-2">
-                <Clock3 /> <span>45 min</span>
+                <Clock3 /> <span>{recipe.cook_time} min</span>
               </div>
               <div className="flex gap-2">
-                <Flame /> <span>12 pcs</span>
+                <Flame /> <span>{recipe.yield} pcs</span>
               </div>
             </div>
           </div>
@@ -166,31 +207,54 @@ export default function IngredientPage() {
           {/* SEPERATOR */}
           <div className="bg-border-base h-[2px]"></div>
 
-          {/* BATCH COUNT */}
-          <div className="flex items-center gap-4">
-            <label htmlFor="batch-count">Batch Count</label>
-            <input
-              type="text"
-              name="batch-count"
-              id="batch-count"
-              className="border-border-base w-16 rounded-lg border bg-white p-2 text-sm font-light"
-              value={batchCount}
-              onChange={(e) => setBatchCount(Number(e.target.value))}
-            />
+          <div className="flex items-center justify-between">
+            {/* BATCH COUNT */}
+            <div className="flex items-center gap-4">
+              <label htmlFor="batch-count">Batch Count</label>
+              <input
+                type="text"
+                name="batch-count"
+                id="batch-count"
+                className="border-border-base w-16 rounded-lg border bg-white p-2 text-sm font-light"
+                value={batchCount}
+                onChange={(e) => setBatchCount(Number(e.target.value))}
+              />
+            </div>
+
+            {/* MAKE */}
+            {isMaking ? (
+              <button
+                type="button"
+                className="text-accent flex cursor-pointer items-center justify-center gap-2 rounded-md bg-white p-2 outline-2 active:scale-95 active:border-none"
+                onClick={makeRecipe}
+              >
+                {updateLoading ? <LoaderCircle className="animate-spin" /> : <Check />}
+                Done
+              </button>
+            ) : (
+              <button
+                type="button"
+                className="bg-accent flex cursor-pointer items-center justify-center gap-2 rounded-md p-2 text-white active:scale-95"
+                onClick={toggleMaking}
+              >
+                {updateLoading ? <LoaderCircle className="animate-spin" /> : <Microwave />}
+                Make
+              </button>
+            )}
           </div>
 
           {/* TABS */}
           <div className="border-border-base flex w-full gap-2 rounded-4xl border bg-white p-1">
             <button
               type="button"
-              className={`${tab === 'ingredients' ? 'bg-accent text-white' : ''} flex w-1/2 justify-center gap-2 rounded-2xl py-1 transition-all duration-300`}
+              className={`${tab === 'ingredients' ? 'bg-text-secondary text-white' : ''} flex w-1/2 justify-center gap-2 rounded-2xl py-1 transition-all duration-300`}
               onClick={() => handleTabs('ingredients')}
             >
               <List /> Ingredients
             </button>
             <button
               type="button"
-              className={`${tab === 'instruction' ? 'bg-accent text-white' : ''} flex w-1/2 justify-center gap-2 rounded-2xl py-1 transition-all duration-300`}
+              className={`${tab === 'instruction' ? 'bg-text-secondary text-white' : ''} flex w-1/2 justify-center gap-2 rounded-2xl py-1 transition-all duration-300`}
               onClick={() => handleTabs('instruction')}
             >
               <TrendingUp /> Instructions

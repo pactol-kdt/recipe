@@ -73,7 +73,7 @@ export const PUT = auth(async function PUT(req, { params }: { params: Promise<{ 
     // Update main recipe
     await client.query(
       `UPDATE recipe
-       SET name = $1, description = $2, is_favorite = $3
+       SET name = $1, description = $2, is_favorite = $3, updated_at = now()
        WHERE id = $4`,
       [name, description, is_favorite, recipeId]
     );

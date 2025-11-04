@@ -10,13 +10,13 @@ export const GET = auth(async function GET(req) {
   const client = await pool.connect();
 
   try {
-    // 📦 Fetch all recipes
-    const recipeResult = await client.query(`SELECT * FROM ingredient_list ORDER BY id DESC`);
-    const recipes = recipeResult.rows;
+    // 📦 Fetch all ingredients
+    const ingredientsResult = await client.query(`SELECT * FROM ingredient_list ORDER BY id DESC`);
+    const ingredients = ingredientsResult.rows;
 
-    return NextResponse.json(recipes);
+    return NextResponse.json(ingredients);
   } catch (error) {
-    console.error('GET /recipe Error:', error);
+    console.error('GET /ingredients Error:', error);
     return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
   } finally {
     client.release();
@@ -31,6 +31,7 @@ export const POST = auth(async function POST(req) {
   const client = await pool.connect();
   const ingredients = await req.json();
   console.log('Received ingredients:', ingredients);
+
   try {
     if (!Array.isArray(ingredients) || ingredients.length === 0) {
       return NextResponse.json({ error: 'Ingredients must be a non-empty array' }, { status: 400 });
@@ -54,9 +55,17 @@ export const POST = auth(async function POST(req) {
           DO UPDATE SET
             quantity = EXCLUDED.quantity,
             minimum_required = EXCLUDED.minimum_required,
-            unit = EXCLUDED.unit
+            unit = EXCLUDED.unit,
+            updated_at = now()
           RETURNING *`,
         [name, quantity, minimum_required, unit]
+      );
+
+      await client.query(
+        `INSERT INTO ingredients_update (name, quantity)
+          VALUES ($1, $2)
+          RETURNING *`,
+        [name, quantity]
       );
 
       insertedIngredients.push(result.rows[0]);
@@ -72,6 +81,108 @@ export const POST = auth(async function POST(req) {
     await client.query('ROLLBACK');
     console.error('Transaction failed:', err);
     return NextResponse.json({ error: 'Failed to insert ingredients' }, { status: 500 });
+  } finally {
+    client.release();
+  }
+});
+
+export const PUT = auth(async function PUT(req) {
+  if (!req.auth) {
+    return NextResponse.json({ message: 'Not authenticated' }, { status: 401 });
+  }
+
+  const client = await pool.connect();
+  const data = await req.json();
+
+  try {
+    await client.query('BEGIN');
+
+    if (data.action === 'deductIngredients') {
+      const { id, batchCount } = data;
+
+      console.log('Updating ingredients for recipe id:', id, 'Batch count:', batchCount);
+      // 🥣 1️⃣ Fetch ingredients used in the recipe
+      const recipeIngredientsResult = await client.query(
+        `SELECT name, quantity, unit
+       FROM ingredients
+       WHERE recipe_id = $1`,
+        [id]
+      );
+
+      const recipeIngredients = recipeIngredientsResult.rows;
+      if (recipeIngredients.length === 0) {
+        throw new Error('No ingredients found for this recipe');
+      }
+
+      const updatedIngredients = [];
+
+      // 🧮 2️⃣ Loop through each ingredient and subtract (quantity * batchCount)
+      for (const ing of recipeIngredients) {
+        const { name, quantity } = ing;
+        const deductedQty = parseFloat(quantity) * batchCount;
+
+        // ⚙️ 3️⃣ Subtract from ingredient_list
+        const result = await client.query(
+          `
+        UPDATE ingredient_list
+        SET quantity = quantity - $1, updated_at = now()
+        WHERE name = $2
+        RETURNING *;
+        `,
+          [deductedQty, name]
+        );
+
+        await client.query(
+          `INSERT INTO ingredients_update (name, quantity)
+          VALUES ($1, $2)
+          RETURNING *`,
+          [name, result.rows[0].quantity]
+        );
+
+        if (result.rows.length > 0) {
+          updatedIngredients.push(result.rows[0]);
+        }
+      }
+    } else if (data.action === 'restockIngredients') {
+      const { items } = data;
+
+      const updatedIngredients = [];
+
+      // 🧮 2️⃣ Loop through each ingredient and subtract (quantity * batchCount)
+      for (const ing of items) {
+        const { name, quantity } = ing;
+
+        // ⚙️ 3️⃣ Subtract from ingredient_list
+        const result = await client.query(
+          `
+        UPDATE ingredient_list
+        SET quantity = quantity + $1, updated_at = now()
+        WHERE name = $2
+        RETURNING *;
+        `,
+          [quantity, name]
+        );
+
+        await client.query(
+          `INSERT INTO ingredients_update (name, quantity)
+          VALUES ($1, $2)
+          RETURNING *`,
+          [name, result.rows[0].quantity]
+        );
+
+        if (result.rows.length > 0) {
+          updatedIngredients.push(result.rows[0]);
+        }
+      }
+    }
+
+    await client.query('COMMIT');
+
+    return NextResponse.json({ message: 'Ingredients updated successfully' }, { status: 200 });
+  } catch (err) {
+    await client.query('ROLLBACK');
+    console.error('Update transaction failed:', err);
+    return NextResponse.json({ error: 'Failed to update ingredients' }, { status: 500 });
   } finally {
     client.release();
   }
