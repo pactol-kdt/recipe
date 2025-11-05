@@ -80,7 +80,7 @@ export default function IngredientsPage() {
   const lowStocks = ingredients.filter((item) => item.quantity < item.minimum_required);
 
   return (
-    <main className="bg-bg-muted flex min-h-[300vh] w-full flex-col items-center">
+    <main className="bg-bg-muted flex min-h-[100vh] w-full flex-col items-center">
       {/* Header */}
       <Header
         title="Ingredients"
@@ -112,7 +112,7 @@ export default function IngredientsPage() {
       {/* Content */}
       <section className="flex min-h-[calc(874px-74px)] w-full max-w-6xl flex-col items-center gap-8 p-4">
         <div className="w-full">
-          <h2 className="sticky top-0 mb-4 text-xl font-medium">Restock Needed</h2>
+          <h2 className="mb-4 text-xl font-medium">Restock Needed</h2>
 
           {lowStocks.length ? (
             <div className="flex w-full flex-col gap-2 rounded-2xl">

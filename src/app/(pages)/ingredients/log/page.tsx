@@ -99,7 +99,7 @@ export default function IngredientsLogPage() {
                         let description = '';
 
                         if (prevQuantity === null) {
-                          description = 'New entry';
+                          description = 'New product';
                         } else if (log.quantity > prevQuantity) {
                           description = `Restocked (+${log.quantity - prevQuantity})`;
                         } else if (log.quantity < prevQuantity) {
