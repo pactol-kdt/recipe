@@ -77,8 +77,9 @@ export default function IngredientsPage() {
     );
   };
 
+  // Sort Ingredients in ASC order
+  const sortedIngredients = ingredients.sort((a, b) => a.name.localeCompare(b.name));
   const lowStocks = ingredients.filter((item) => item.quantity < item.minimum_required);
-
   return (
     <main className="bg-bg-muted flex min-h-[100vh] w-full flex-col items-center">
       {/* Header */}
