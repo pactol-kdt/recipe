@@ -1,8 +1,14 @@
+import { redirect } from 'next/navigation';
 import { auth, signIn, signOut } from '../auth';
+import { paths } from '~/meta';
 
 export default async function SignIn() {
   const session = await auth();
-
+  if (!session?.user) {
+    redirect(paths.DASHBOARD);
+  } else {
+    redirect(paths.AUTH);
+  }
   return (
     <main>
       {!session?.user && (

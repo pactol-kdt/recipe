@@ -20,6 +20,7 @@ export const paths = {
   RECIPE: '/recipes',
   LOG: '/logs',
   USER: '/user',
+  AUTH: '/auth',
 
   // CRUD
   ADD: '/add',

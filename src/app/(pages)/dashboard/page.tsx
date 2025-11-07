@@ -61,7 +61,7 @@ export default function DashboardPage() {
   if (loading) return <HeartLoader />;
 
   const lowStocks = ingredients.filter((item) => item.quantity < item.minimum_required);
-  const lastUpdate = formatDate(ingredientsUpdate[ingredientsUpdate.length - 1].created_at);
+  const lastUpdate = formatDate(ingredientsUpdate[ingredientsUpdate.length - 1]?.created_at);
 
   return (
     <main className="bg-bg-muted flex min-h-[100vh] w-full flex-col items-center">

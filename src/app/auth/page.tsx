@@ -1,10 +1,11 @@
 import { redirect } from 'next/navigation';
 import { auth, signIn } from '~/auth';
+import { paths } from '~/meta';
 
 export default async function LoginPage() {
   const session = await auth();
 
-  if (session?.user) redirect('/recipes');
+  if (session?.user) redirect(paths.DASHBOARD);
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-center gap-4">
@@ -12,7 +13,7 @@ export default async function LoginPage() {
       <form
         action={async () => {
           'use server';
-          await signIn('github', { redirectTo: '/recipes' });
+          await signIn('github', { redirectTo: paths.DASHBOARD });
         }}
       >
         <button
