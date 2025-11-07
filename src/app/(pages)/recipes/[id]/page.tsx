@@ -143,8 +143,9 @@ export default function IngredientPage() {
     router.push(paths.RECIPE);
     return null;
   }
+
   return (
-    <main>
+    <main className="relative h-screen overflow-hidden">
       {/* IMAGE */}
       <div className="relative h-[328px] w-full">
         {/* Image */}
@@ -188,7 +189,7 @@ export default function IngredientPage() {
       </div>
 
       {/* CONTENT */}
-      <div className="bg-bg-muted absolute top-[300px] left-0 min-h-[calc(100vh-300px)] w-full rounded-t-2xl px-4 py-6">
+      <div className="absolute top-[300px] left-0 h-[calc(100vh-300px-56px)] w-full overflow-y-auto rounded-t-2xl bg-gray-100 px-4 py-6">
         <div className="flex flex-col gap-4">
           <div className="mt-2">
             <h1 className="text-xl">{recipe.name}</h1>

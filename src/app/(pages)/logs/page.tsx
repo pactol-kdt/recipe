@@ -61,9 +61,9 @@ export default function IngredientsLogPage() {
 
   return (
     <main className="bg-bg-muted flex min-h-screen w-full flex-col items-center">
-      <Header title="Log" menuButtons={[]} backButton={true} />
+      <Header title="Log" menuButtons={[]} backButton={false} />
 
-      <section className="flex w-full max-w-6xl flex-col items-center gap-8 p-4">
+      <section className="flex h-[calc(874px-74px-56px)] w-full max-w-6xl flex-col items-center gap-8 overflow-auto p-4">
         <div className="w-full">
           <h2 className="mb-4 text-xl font-medium">Activity Log</h2>
 

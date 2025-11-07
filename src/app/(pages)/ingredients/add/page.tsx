@@ -102,7 +102,7 @@ const AddIngredientsPage = () => {
       {/* Header */}
       <Header title="Restock Ingredients" menuButtons={[]} backButton={true} />
 
-      <section className="w-full space-y-4 p-2">
+      <section className="flex h-[calc(100vh-74px-56px)] w-full max-w-6xl flex-col items-center gap-8 overflow-auto p-4">
         <div className="w-full rounded-2xl bg-white p-4">
           {/* Header */}
           <div className="mb-4 flex items-center justify-between">

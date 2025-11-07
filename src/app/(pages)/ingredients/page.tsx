@@ -1,6 +1,6 @@
 'use client';
 
-import { Box, Check, History, Pencil, RefreshCw, Trash2 } from 'lucide-react';
+import { Box, Check, Pencil, RefreshCw, Trash2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import Header from '~/components/Header';
@@ -78,7 +78,7 @@ export default function IngredientsPage() {
   };
 
   // Sort Ingredients in ASC order
-  const sortedIngredients = ingredients.sort((a, b) => a.name.localeCompare(b.name));
+  ingredients.sort((a, b) => a.name.localeCompare(b.name));
   const lowStocks = ingredients.filter((item) => item.quantity < item.minimum_required);
   return (
     <main className="bg-bg-muted flex min-h-[100vh] w-full flex-col items-center">
@@ -101,17 +101,12 @@ export default function IngredientsPage() {
             label: isEditing ? 'Done' : 'Edit',
             fn: () => setIsEditing(!isEditing),
           },
-          {
-            icon: <History />,
-            label: 'Log',
-            fn: () => router.push(`${paths.INGREDIENT}${paths.LOG}`),
-          },
         ]}
         backButton={false}
       />
 
       {/* Content */}
-      <section className="flex min-h-[calc(874px-74px)] w-full max-w-6xl flex-col items-center gap-8 p-4">
+      <section className="flex min-h-[calc(100vh-74px-56px)] w-full max-w-6xl flex-col items-center gap-8 overflow-auto p-4">
         <div className="w-full">
           <h2 className="mb-4 text-xl font-medium">Restock Needed</h2>
 

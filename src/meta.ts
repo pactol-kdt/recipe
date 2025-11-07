@@ -14,10 +14,12 @@ export const logo = {
 
 export const paths = {
   // PAGES
+  DASHBOARD: '/dashboard',
   INGREDIENT: '/ingredients',
   ORDER: '/orders',
-  RECIPE: '/log',
-  LOG: '/log',
+  RECIPE: '/recipes',
+  LOG: '/logs',
+  USER: '/user',
 
   // CRUD
   ADD: '/add',

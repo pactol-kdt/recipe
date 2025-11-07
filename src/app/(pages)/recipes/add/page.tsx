@@ -118,7 +118,7 @@ export default function AddNewRecipePage() {
       <Header title="Add New Recipe" menuButtons={[]} backButton={true} />
 
       {/* Content */}
-      <section className="flex min-h-[calc(874px-74px)] w-full max-w-2xl flex-col items-center gap-8 p-4">
+      <section className="flex h-[calc(100vh-74px-56px)] w-full max-w-6xl flex-col items-center gap-8 overflow-auto p-4">
         <div className="w-full rounded-2xl bg-white p-4">
           <h2 className="font-bold">DETAILS</h2>
 

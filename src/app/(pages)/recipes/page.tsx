@@ -34,7 +34,7 @@ export default function RecipePage() {
   if (loading) return <HeartLoader />;
 
   // Sort Recipe in ASC order
-  const sortedRecipes = recipes.sort((a, b) => a.name.localeCompare(b.name));
+  recipes.sort((a, b) => a.name.localeCompare(b.name));
   const favorites = recipes.filter((item) => item.is_favorite);
   return (
     <main className="bg-bg-muted flex min-h-screen w-full flex-col items-center">
@@ -52,7 +52,7 @@ export default function RecipePage() {
       />
 
       {/* Content */}
-      <section className="flex min-h-[calc(874px-74px)] max-w-6xl flex-col items-center gap-8 p-4">
+      <section className="flex h-[calc(100vh-74px-56px)] w-full max-w-6xl flex-col items-center gap-8 overflow-auto p-4">
         {/* Favorites */}
         {favorites.length > 0 && (
           <div>
