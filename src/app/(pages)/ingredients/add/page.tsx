@@ -134,11 +134,14 @@ const AddIngredientsPage = () => {
           ) : (
             // Content
             <div className="mt-4 grid grid-cols-12 gap-2">
-              <label htmlFor="ingredient-name" className="col-span-8">
+              <label htmlFor="ingredient-name" className="col-span-5">
                 Name
               </label>
               <label htmlFor="ingredient-quantity" className="col-span-4">
                 Qty
+              </label>
+              <label htmlFor="ingredient-quantity" className="col-span-3">
+                Unit
               </label>
 
               {items?.map((item, index) => {

@@ -1,6 +1,6 @@
 'use client';
 
-import { Cookie, History, LayoutDashboard, Notebook, UserRound } from 'lucide-react';
+import { Cookie, History, LayoutDashboard, Notebook, PiggyBank, UserRound } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { paths } from '~/meta';
@@ -27,6 +27,12 @@ const NavigationBar = () => {
         className={`${pathname.includes(paths.RECIPE) ? 'bg-accent text-white' : ''} hover:bg-accent rounded-md p-2 hover:text-white`}
       >
         <Cookie width={24} height={24} />
+      </Link>
+      <Link
+        href={paths.SALES_INCOME}
+        className={`${pathname.includes(paths.SALES_INCOME) ? 'bg-accent text-white' : ''} hover:bg-accent rounded-md p-2 hover:text-white`}
+      >
+        <PiggyBank width={24} height={24} />
       </Link>
       <Link
         href={paths.LOG}
