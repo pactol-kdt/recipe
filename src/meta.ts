@@ -26,6 +26,7 @@ export const paths = {
   // CRUD
   ADD: '/add',
   UPDATE: '/update',
+  RESTOCK: '/restock',
 
   // ERROR
   NOT_FOUND: '/not-found',

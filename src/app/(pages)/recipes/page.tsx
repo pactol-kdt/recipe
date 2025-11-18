@@ -37,7 +37,7 @@ export default function RecipePage() {
   recipes.sort((a, b) => a.name.localeCompare(b.name));
   const favorites = recipes.filter((item) => item.is_favorite);
   return (
-    <main className="bg-bg-muted flex min-h-screen w-full flex-col items-center">
+    <main className="bg-bg-muted flex h-[calc(100vh-74px-56px)] w-full flex-col items-center">
       {/* Header */}
       <Header
         title="Recipes"

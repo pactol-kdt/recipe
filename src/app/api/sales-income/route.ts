@@ -49,7 +49,7 @@ export const POST = auth(async function POST(req) {
       }
 
       // Insert into sales_income table
-      const result = await client.query(
+      await client.query(
         `INSERT INTO sales_income (name, amount, date, note)
           VALUES ($1, $2, $3, $4)
           RETURNING *`,
@@ -57,7 +57,7 @@ export const POST = auth(async function POST(req) {
       );
 
       // Update daily_totals table
-      const updateDailyFinancials = await client.query(
+      await client.query(
         `
           INSERT INTO daily_totals (date, total_sales)
           VALUES ($1, $2)

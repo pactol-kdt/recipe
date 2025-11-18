@@ -1,6 +1,6 @@
 'use client';
 
-import { Box, Check, Info, Pencil, PiggyBank, Plus, Trash2 } from 'lucide-react';
+import { Check, Pencil, PiggyBank, Plus, Trash2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import Header from '~/components/Header';

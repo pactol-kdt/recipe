@@ -1,6 +1,6 @@
 'use client';
 
-import { Box, Check, Pencil, RefreshCw, Trash2 } from 'lucide-react';
+import { Box, Check, Pencil, Plus, Trash2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import Header from '~/components/Header';
@@ -89,12 +89,12 @@ export default function IngredientsPage() {
           {
             icon: <Box />,
             label: 'Restock Ingredient',
-            fn: () => router.push(`${paths.INGREDIENT}${paths.ADD}`),
+            fn: () => router.push(`${paths.INGREDIENT}${paths.RESTOCK}`),
           },
           {
-            icon: <RefreshCw />,
-            label: 'Update Ingredient',
-            fn: () => router.push(`${paths.INGREDIENT}${paths.UPDATE}`),
+            icon: <Plus />,
+            label: 'Add Ingredient',
+            fn: () => router.push(`${paths.INGREDIENT}${paths.ADD}`),
           },
           {
             icon: isEditing ? <Check /> : <Pencil />,
@@ -106,7 +106,7 @@ export default function IngredientsPage() {
       />
 
       {/* Content */}
-      <section className="flex min-h-[calc(100vh-74px-56px)] w-full max-w-6xl flex-col items-center gap-8 overflow-auto p-4">
+      <section className="flex h-[calc(100vh-74px-56px)] w-full max-w-6xl flex-col items-center gap-8 overflow-auto p-4">
         <div className="w-full">
           <h2 className="mb-4 text-xl font-medium">Restock Needed</h2>
 

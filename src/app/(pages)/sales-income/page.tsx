@@ -44,7 +44,7 @@ export default function SalesIncomePage() {
 
   if (loading) return <HeartLoader />;
   return (
-    <main className="bg-bg-muted flex min-h-[100vh] w-full flex-col items-center">
+    <main className="bg-bg-muted flex h-[calc(100vh-74px-56px)] w-full flex-col items-center">
       {/* Header */}
       <Header
         title="Sales Income"

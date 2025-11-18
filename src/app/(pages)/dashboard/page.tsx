@@ -69,7 +69,7 @@ export default function DashboardPage() {
       <Header title="Love, Cheewi Monitoring" menuButtons={[]} backButton={false} />
 
       {/* Content */}
-      <section className="flex min-h-[calc(100vh-74px-56px)] w-full max-w-6xl flex-col items-center gap-4 overflow-auto p-4">
+      <section className="flex h-[calc(100vh-74px-56px)] w-full max-w-6xl flex-col items-center gap-4 overflow-auto p-4">
         {/* Cash */}
         <div className="flex w-full flex-col gap-4 rounded-2xl bg-[linear-gradient(to_bottom_right,#FF809E_0%,#FF99B1_100%)] p-4 text-white">
           <div className="text-sm font-bold">CASH</div>

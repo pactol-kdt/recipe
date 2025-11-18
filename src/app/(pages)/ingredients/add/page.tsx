@@ -1,17 +1,18 @@
 'use client';
 
-import { Box, Check, Pencil, Plus, Trash2 } from 'lucide-react';
+import { Check, Pencil, Plus, Save, Trash2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import Header from '~/components/Header';
 import HeartLoader from '~/components/Loader';
+import { capitalize } from '~/lib/capitalize';
 import { paths } from '~/meta';
 
 type IngredientList = {
   name: string;
   quantity: number;
-  minimum_required?: number;
-  unit?: string;
+  minimum_required: number;
+  unit: string;
 };
 
 const AddIngredientsPage = () => {
@@ -40,18 +41,14 @@ const AddIngredientsPage = () => {
     fetchIngredients();
   }, []);
 
-  const findValue = (name: string) => {
-    return ingredients.find((ing) => ing.name === name)?.unit;
-  };
-
-  const restockIngredients = async () => {
-    console.log('Restocking ingredients...:', items);
+  const saveRecipe = async () => {
+    console.log('Saving recipe...:', items);
 
     try {
       const response = await fetch('/api/ingredients', {
-        method: 'PUT',
+        method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ action: 'restockIngredients', items }),
+        body: JSON.stringify(items),
       });
 
       if (!response.ok) {
@@ -73,12 +70,16 @@ const AddIngredientsPage = () => {
       {
         name: '',
         quantity: 0,
+        minimum_required: 0,
+        unit: 'g',
       },
     ]);
   };
 
   const handleChange = (index: number, field: keyof IngredientList, value: string) => {
-    setItems((prev) => prev.map((item, i) => (i === index ? { ...item, [field]: value } : item)));
+    setItems((prev) =>
+      prev.map((item, i) => (i === index ? { ...item, [field]: capitalize(value) } : item))
+    );
   };
 
   const handleRemove = (index: number) => {
@@ -86,7 +87,7 @@ const AddIngredientsPage = () => {
   };
 
   const handleSave = () => {
-    const hasEmpty = items?.some((item) => !item.name.trim());
+    const hasEmpty = items?.some((item) => !item.name.trim() || !item.unit.trim());
 
     if (hasEmpty) return;
 
@@ -94,13 +95,15 @@ const AddIngredientsPage = () => {
     console.log(items);
   };
 
-  const hasEmptyFields = items?.some((item) => !item.name.trim());
+  const hasEmptyFields = items?.some(
+    (item) => !item.name.trim() || !item.unit.trim() || !item.quantity || !item.minimum_required
+  );
 
   if (loading) return <HeartLoader />;
   return (
     <main className="bg-bg-muted flex min-h-screen w-full flex-col items-center">
       {/* Header */}
-      <Header title="Restock Ingredients" menuButtons={[]} backButton={true} />
+      <Header title="Add Ingredients" menuButtons={[]} backButton={true} />
 
       <section className="flex h-[calc(100vh-74px-56px)] w-full max-w-6xl flex-col items-center gap-8 overflow-auto p-4">
         <div className="w-full rounded-2xl bg-white p-4">
@@ -137,76 +140,80 @@ const AddIngredientsPage = () => {
               <label htmlFor="ingredient-name" className="col-span-5">
                 Name
               </label>
-              <label htmlFor="ingredient-quantity" className="col-span-4">
+              <label htmlFor="ingredient-quantity" className="col-span-2">
                 Qty
               </label>
-              <label htmlFor="ingredient-quantity" className="col-span-3">
+              <label htmlFor="ingredient-minimum-quantity" className="col-span-2">
+                Min
+              </label>
+              <label htmlFor="ingredient-unit" className="col-span-3">
                 Unit
               </label>
 
-              {items?.map((item, index) => {
-                const selectedNames = items.map((i) => i.name);
+              {items?.map((item, index) => (
+                <div key={index} className="col-span-12 grid grid-cols-12 items-center gap-2">
+                  <input
+                    list="ingredients"
+                    type="text"
+                    name="ingredient-name"
+                    id="ingredient-name"
+                    placeholder="Bread"
+                    disabled={!isEditing}
+                    onChange={(e) => handleChange(index, 'name', e.target.value)}
+                    className="border-border-base col-span-5 rounded-lg border bg-white p-2 text-sm font-light capitalize"
+                  />
 
-                return (
-                  <div key={index} className="col-span-12 grid grid-cols-12 items-center gap-2">
-                    <select
-                      name="ingredient-name"
-                      id="ingredient-name"
-                      disabled={!isEditing}
-                      onChange={(e) => handleChange(index, 'name', e.target.value)}
-                      className="border-border-base col-span-5 rounded-lg border bg-white p-2 text-sm font-light capitalize"
+                  <datalist id="ingredients">
+                    {ingredients.map((ingredient, idx) => (
+                      <option key={idx} value={ingredient.name} />
+                    ))}
+                  </datalist>
+
+                  <input
+                    type="number"
+                    name="ingredient-quantity"
+                    id="ingredient-quantity"
+                    placeholder="200"
+                    disabled={!isEditing}
+                    onChange={(e) => handleChange(index, 'quantity', e.target.value)}
+                    className="border-border-base col-span-2 rounded-lg border bg-white p-2 text-sm font-light"
+                  />
+
+                  <input
+                    type="number"
+                    name="ingredient-minimum-quantity"
+                    id="ingredient-minimum-quantity"
+                    placeholder="200"
+                    disabled={!isEditing}
+                    onChange={(e) => handleChange(index, 'minimum_required', e.target.value)}
+                    className="border-border-base col-span-2 rounded-lg border bg-white p-2 text-sm font-light"
+                  />
+
+                  <select
+                    name="ingredient-unit"
+                    id="ingredient-unit"
+                    disabled={!isEditing}
+                    onChange={(e) => handleChange(index, 'unit', e.target.value)}
+                    className="border-border-base col-span-3 rounded-lg border bg-white p-2 text-sm font-light"
+                  >
+                    <option value="g">g</option>
+                    <option value="ml">ml</option>
+                    <option value="pc">pc</option>
+                    <option value="tsp">tsp</option>
+                  </select>
+
+                  {/* Delete Button (only when editing) */}
+                  {isEditing && (
+                    <button
+                      type="button"
+                      onClick={() => handleRemove(index)}
+                      className="col-span-12 flex items-center justify-center gap-4 rounded-sm border border-red-500 p-2 text-red-500"
                     >
-                      <option value="">Select ingredient</option>
-                      {ingredients
-                        .filter(
-                          (ingredient) =>
-                            // show ingredient if it's not selected anywhere else
-                            !selectedNames.includes(ingredient.name) ||
-                            ingredient.name === item.name // keep current selection visible
-                        )
-                        .map((ingredient, ingredientIdx) => (
-                          <option key={ingredientIdx} value={ingredient.name}>
-                            {ingredient.name}
-                          </option>
-                        ))}
-                    </select>
-
-                    <input
-                      type="number"
-                      name="ingredient-quantity"
-                      id="ingredient-quantity"
-                      placeholder="200"
-                      disabled={!isEditing}
-                      onChange={(e) => handleChange(index, 'quantity', e.target.value)}
-                      className="border-border-base col-span-4 rounded-lg border bg-white p-2 text-sm font-light"
-                    />
-
-                    <select
-                      name="ingredient-unit"
-                      id="ingredient-unit"
-                      disabled
-                      onChange={(e) => handleChange(index, 'unit', e.target.value)}
-                      className="border-border-base bg-bg-muted col-span-3 rounded-lg border p-2 text-sm font-light"
-                      value={findValue(item.name) || ''}
-                    >
-                      <option value="g">g</option>
-                      <option value="ml">ml</option>
-                      <option value="pc">pc</option>
-                      <option value="tsp">tsp</option>
-                    </select>
-                    {/* Delete Button (only when editing) */}
-                    {isEditing && (
-                      <button
-                        type="button"
-                        onClick={() => handleRemove(index)}
-                        className="col-span-12 flex items-center justify-center gap-4 rounded-sm border border-red-500 p-2 text-red-500"
-                      >
-                        <Trash2 size={18} /> Delete
-                      </button>
-                    )}
-                  </div>
-                );
-              })}
+                      <Trash2 size={18} /> Delete
+                    </button>
+                  )}
+                </div>
+              ))}
             </div>
           )}
 
@@ -226,11 +233,12 @@ const AddIngredientsPage = () => {
         <div className="flex w-full flex-col justify-between gap-4">
           <button
             type="button"
-            className="bg-accent flex items-center justify-center gap-2 rounded-2xl p-2 font-bold text-white active:scale-95"
-            onClick={restockIngredients}
+            className={`${items.length === 0 || isEditing ? 'opacity-50' : 'active:scale-95'} bg-accent flex items-center justify-center gap-2 rounded-2xl p-2 font-bold text-white`}
+            onClick={saveRecipe}
+            disabled={items.length === 0 && isEditing}
           >
-            <Box />
-            Restock Ingredients
+            <Save />
+            Save Recipe
           </button>
           {/* <span className="text-light text-center text-red-400">{errorMessage}</span> */}
         </div>
