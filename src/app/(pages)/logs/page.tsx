@@ -3,10 +3,12 @@
 import { useEffect, useState } from 'react';
 import Header from '~/components/Header';
 import HeartLoader from '~/components/Loader';
+import { formatDate } from '~/lib/formatDate';
 
 export type IngredientLog = {
   id: number;
   ingredient_id?: number;
+  is_new: boolean;
   name: string;
   quantity: number;
   minimum_required: number;
@@ -59,6 +61,7 @@ export default function IngredientsLogPage() {
     {} as Record<string, IngredientLog[]>
   );
 
+  console.log(grouped);
   return (
     <main className="bg-bg-muted flex min-h-screen w-full flex-col items-center">
       <Header title="Log" menuButtons={[]} backButton={false} />
@@ -94,16 +97,19 @@ export default function IngredientsLogPage() {
                       </tr>
                     </thead>
                     <tbody>
-                      {logs.map((log, idx) => {
-                        const prevQuantity = idx < logs.length - 1 ? logs[idx + 1].quantity : null;
+                      {logs.slice(0, 3).map((log, idx) => {
+                        // Compare to the **next log**, which is older
+                        const olderLog = idx < logs.length - 1 ? logs[idx + 1] : null;
                         let description = '';
+                        const quantity = +log.quantity;
+                        const olderQuantity = olderLog ? +olderLog.quantity : 0;
 
-                        if (prevQuantity === null) {
-                          description = 'New product';
-                        } else if (log.quantity > prevQuantity) {
-                          description = `Restocked (+${log.quantity - prevQuantity})`;
-                        } else if (log.quantity < prevQuantity) {
-                          description = `Used (-${prevQuantity - log.quantity})`;
+                        if (log.is_new === true) {
+                          description = 'New product'; // oldest entry
+                        } else if (quantity > olderQuantity) {
+                          description = `Restocked (+${quantity - olderQuantity})`;
+                        } else if (quantity < olderQuantity) {
+                          description = `Used (-${olderQuantity - quantity})`;
                         } else {
                           description = 'No change';
                         }
@@ -113,7 +119,7 @@ export default function IngredientsLogPage() {
                             key={idx}
                             className="transition-colors even:bg-gray-50 hover:bg-gray-100"
                           >
-                            <td className="p-2 text-gray-800">{log.quantity}</td>
+                            <td className="p-2 text-gray-800">{quantity}</td>
                             <td
                               className={`p-2 font-medium ${
                                 description.includes('Restocked')
@@ -125,9 +131,7 @@ export default function IngredientsLogPage() {
                             >
                               {description}
                             </td>
-                            <td className="p-2 text-gray-500">
-                              {new Date(log.updated_at ?? '').toLocaleString()}
-                            </td>
+                            <td className="p-2 text-gray-500">{formatDate(log.updated_at!)}</td>
                           </tr>
                         );
                       })}

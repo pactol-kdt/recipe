@@ -6,13 +6,7 @@ import { useEffect, useState } from 'react';
 import Header from '~/components/Header';
 import HeartLoader from '~/components/Loader';
 import { paths } from '~/meta';
-
-type IngredientList = {
-  name: string;
-  quantity: number;
-  minimum_required?: number;
-  unit?: string;
-};
+import { IngredientList } from '~/types/ingredient-list';
 
 const AddIngredientsPage = () => {
   const router = useRouter();
@@ -73,6 +67,8 @@ const AddIngredientsPage = () => {
       {
         name: '',
         quantity: 0,
+        cost: 0,
+        date: new Date().toISOString().slice(0, 10),
       },
     ]);
   };
@@ -86,15 +82,15 @@ const AddIngredientsPage = () => {
   };
 
   const handleSave = () => {
-    const hasEmpty = items?.some((item) => !item.name.trim());
-
-    if (hasEmpty) return;
+    if (hasEmptyFields) return;
 
     setIsEditing(false);
     console.log(items);
   };
 
-  const hasEmptyFields = items?.some((item) => !item.name.trim());
+  const hasEmptyFields = items?.some(
+    (item) => !item.name.trim() || !item.quantity || !item.cost || !item.date!.trim
+  );
 
   if (loading) return <HeartLoader />;
   return (
@@ -137,14 +133,17 @@ const AddIngredientsPage = () => {
               <label htmlFor="ingredient-name" className="col-span-4">
                 Name
               </label>
-              <label htmlFor="ingredient-quantity" className="col-span-3">
+              <label htmlFor="ingredient-quantity" className="col-span-2">
                 Qty
               </label>
-              <label htmlFor="ingredient-quantity" className="col-span-3">
+              <label htmlFor="ingredient-cost" className="col-span-2">
                 Cost
               </label>
               <label htmlFor="ingredient-quantity" className="col-span-2">
                 Unit
+              </label>
+              <label htmlFor="ingredient-quantity" className="col-span-2">
+                Date
               </label>
 
               {items?.map((item, index) => {
@@ -181,17 +180,17 @@ const AddIngredientsPage = () => {
                       placeholder="200"
                       disabled={!isEditing}
                       onChange={(e) => handleChange(index, 'quantity', e.target.value)}
-                      className="border-border-base col-span-3 rounded-lg border bg-white p-2 text-sm font-light"
+                      className="border-border-base col-span-2 rounded-lg border bg-white p-2 text-sm font-light"
                     />
 
                     <input
                       type="number"
-                      name="ingredient-quantity"
-                      id="ingredient-quantity"
+                      name="ingredient-cost"
+                      id="ingredient-cost"
                       placeholder="200"
                       disabled={!isEditing}
-                      onChange={(e) => handleChange(index, 'quantity', e.target.value)}
-                      className="border-border-base col-span-3 rounded-lg border bg-white p-2 text-sm font-light"
+                      onChange={(e) => handleChange(index, 'cost', e.target.value)}
+                      className="border-border-base col-span-2 rounded-lg border bg-white p-2 text-sm font-light"
                     />
 
                     <select
@@ -207,6 +206,15 @@ const AddIngredientsPage = () => {
                       <option value="pc">pc</option>
                       <option value="tsp">tsp</option>
                     </select>
+
+                    <input
+                      type="date"
+                      name={`cash-date`}
+                      id={`cash-date`}
+                      value={item.date}
+                      onChange={(e) => handleChange(index, 'date', e.target.value)}
+                      className="border-border-base col-span-2 rounded-lg border p-2 text-sm font-light"
+                    />
                     {/* Delete Button (only when editing) */}
                     {isEditing && (
                       <button
@@ -239,8 +247,9 @@ const AddIngredientsPage = () => {
         <div className="flex w-full flex-col justify-between gap-4">
           <button
             type="button"
-            className="bg-accent flex items-center justify-center gap-2 rounded-2xl p-2 font-bold text-white active:scale-95"
+            className={`${items.length === 0 || isEditing ? 'opacity-50' : 'active:scale-95'} bg-accent flex items-center justify-center gap-2 rounded-2xl p-2 font-bold text-white`}
             onClick={restockIngredients}
+            disabled={items.length === 0 && isEditing}
           >
             <Box />
             Restock Ingredients

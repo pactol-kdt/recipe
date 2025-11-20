@@ -6,14 +6,7 @@ import { useEffect, useState } from 'react';
 import Header from '~/components/Header';
 import HeartLoader from '~/components/Loader';
 import { paths } from '~/meta';
-
-export type IngredientList = {
-  id: number;
-  name: string;
-  quantity: number;
-  minimum_required: number;
-  unit: string;
-};
+import { IngredientList } from '~/types/ingredient-list';
 
 export default function IngredientsPage() {
   const router = useRouter();
@@ -50,14 +43,12 @@ export default function IngredientsPage() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ ids: selectedIngredients }), // pass names array
+        body: JSON.stringify({ ids: selectedIngredients }),
       });
 
       if (res.ok) {
-        // ✅ Remove deleted items from state
-        setIngredients((prev) => prev.filter((ing) => !selectedIngredients.includes(ing.id)));
+        setIngredients((prev) => prev.filter((ing) => !selectedIngredients.includes(ing.id!)));
 
-        // Clear selection
         setSelectedIngredients([]);
       } else {
         const data = await res.json();
@@ -79,7 +70,7 @@ export default function IngredientsPage() {
 
   // Sort Ingredients in ASC order
   ingredients.sort((a, b) => a.name.localeCompare(b.name));
-  const lowStocks = ingredients.filter((item) => item.quantity < item.minimum_required);
+  const lowStocks = ingredients.filter((item) => item.quantity < item.minimum_required!);
   return (
     <main className="bg-bg-muted flex min-h-[100vh] w-full flex-col items-center">
       {/* Header */}
@@ -140,9 +131,9 @@ export default function IngredientsPage() {
                     {!isEditing && (
                       <div
                         className={`h-2 w-2 rounded-full ${
-                          item.quantity >= item.minimum_required * 2
+                          item.quantity >= item.minimum_required! * 2
                             ? 'bg-green-500'
-                            : item.quantity >= item.minimum_required
+                            : item.quantity >= item.minimum_required!
                               ? 'bg-orange-500'
                               : 'bg-red-500'
                         }`}
@@ -154,8 +145,8 @@ export default function IngredientsPage() {
                       <label className="flex items-center gap-2">
                         <input
                           type="checkbox"
-                          checked={selectedIngredients.includes(item.id)}
-                          onChange={() => toggleCheck(item.id)}
+                          checked={selectedIngredients.includes(item.id!)}
+                          onChange={() => toggleCheck(item.id!)}
                           className="h-4 w-4 accent-blue-500"
                         />
                         {item.name}

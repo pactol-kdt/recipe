@@ -7,13 +7,7 @@ import Header from '~/components/Header';
 import HeartLoader from '~/components/Loader';
 import { capitalize } from '~/lib/capitalize';
 import { paths } from '~/meta';
-
-type IngredientList = {
-  name: string;
-  quantity: number;
-  minimum_required: number;
-  unit: string;
-};
+import { IngredientList } from '~/types/ingredient-list';
 
 const AddIngredientsPage = () => {
   const router = useRouter();
@@ -41,7 +35,7 @@ const AddIngredientsPage = () => {
     fetchIngredients();
   }, []);
 
-  const saveRecipe = async () => {
+  const addIngredients = async () => {
     console.log('Saving recipe...:', items);
 
     try {
@@ -87,19 +81,19 @@ const AddIngredientsPage = () => {
   };
 
   const handleSave = () => {
-    const hasEmpty = items?.some((item) => !item.name.trim() || !item.unit.trim());
-
-    if (hasEmpty) return;
+    if (hasEmptyFields) return;
 
     setIsEditing(false);
     console.log(items);
   };
 
   const hasEmptyFields = items?.some(
-    (item) => !item.name.trim() || !item.unit.trim() || !item.quantity || !item.minimum_required
+    (item) => !item.name.trim() || !item.unit!.trim() || !item.quantity || !item.minimum_required
   );
 
   if (loading) return <HeartLoader />;
+  ingredients.sort((a, b) => a.name.localeCompare(b.name));
+
   return (
     <main className="bg-bg-muted flex min-h-screen w-full flex-col items-center">
       {/* Header */}
@@ -234,11 +228,11 @@ const AddIngredientsPage = () => {
           <button
             type="button"
             className={`${items.length === 0 || isEditing ? 'opacity-50' : 'active:scale-95'} bg-accent flex items-center justify-center gap-2 rounded-2xl p-2 font-bold text-white`}
-            onClick={saveRecipe}
+            onClick={addIngredients}
             disabled={items.length === 0 && isEditing}
           >
-            <Save />
-            Save Recipe
+            <Plus />
+            Add Ingredients
           </button>
           {/* <span className="text-light text-center text-red-400">{errorMessage}</span> */}
         </div>

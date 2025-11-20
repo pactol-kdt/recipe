@@ -187,29 +187,6 @@ export default function AddNewRecipePage() {
                 dataLength={cookTime.length}
               />
             </div>
-
-            {/* Yield */}
-            <div className="flex flex-col gap-1">
-              <label htmlFor="yield">
-                Yield <span className="text-text-secondary">(pcs)</span>
-              </label>
-              <input
-                type="number"
-                name="yield"
-                id="yield"
-                placeholder='e.g. "24"'
-                className={`${isSubmit && yieldCount.length === 0 ? 'border-2 border-red-500' : 'border-border-base border'} rounded-lg bg-white p-2 text-sm font-light`}
-                value={yieldCount}
-                onChange={(e) => setYieldCount((e.target as HTMLInputElement).value)}
-              />
-
-              {/* Error message (shown only when empty on submit) */}
-              <ErrorLabel
-                message="Yield Count is required."
-                isSubmit={isSubmit}
-                dataLength={description.length}
-              />
-            </div>
           </div>
         </div>
 

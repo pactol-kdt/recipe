@@ -89,18 +89,36 @@ export default function IngredientPage() {
     setUpdateLoading(true);
 
     try {
-      const res = await fetch(`/api/ingredients`, {
+      const ingredientsRes = await fetch(`/api/ingredients`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ action: 'deductIngredients', batchCount, id }),
       });
 
-      if (!res.ok) {
+      if (!ingredientsRes.ok) {
         throw new Error('Failed to update ingredients');
       }
+
+      const ingredientsData = await ingredientsRes.json();
+
       setIsMaking(false);
 
-      return res.json();
+      const recipeSalesRes = await fetch('/api/recipe_sales', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: recipe.name,
+          batch_made: batchCount,
+        }),
+      });
+
+      if (!recipeSalesRes.ok) {
+        throw new Error('Failed to update recipe sales');
+      }
+
+      const recipeSalesData = await recipeSalesRes.json();
+
+      return { ingredients: ingredientsData, recipeSales: recipeSalesData };
     } catch (error) {
       console.error('Error fetching recipes:', error);
     } finally {
@@ -198,9 +216,6 @@ export default function IngredientPage() {
             <div className="text-text-secondary mt-4 flex gap-4 font-light">
               <div className="flex gap-2">
                 <Clock3 /> <span>{recipe.cook_time} min</span>
-              </div>
-              <div className="flex gap-2">
-                <Flame /> <span>{recipe.yield} pcs</span>
               </div>
             </div>
           </div>

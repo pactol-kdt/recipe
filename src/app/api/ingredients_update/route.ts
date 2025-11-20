@@ -10,15 +10,28 @@ export const GET = auth(async function GET(req) {
   const client = await pool.connect();
 
   try {
-    // 📦 Fetch all ingredients
-    const ingredientsResult = await client.query(
-      `SELECT * FROM ingredients_update ORDER BY id DESC`
-    );
-    const ingredients = ingredientsResult.rows;
+    // 📦 Fetch all ingredients_update
+    const ingredientsUpdateResult = await client.query(`
+      SELECT *,
+            CASE 
+              WHEN id = first_id THEN true
+              ELSE false
+            END AS is_new
+      FROM (
+        SELECT *,
+              ROW_NUMBER() OVER (PARTITION BY name ORDER BY id DESC) AS rn,
+              MIN(id) OVER (PARTITION BY name) AS first_id
+        FROM ingredients_update
+      ) sub
+      WHERE rn <= 4
+      ORDER BY name, id DESC;
+    `);
+
+    const ingredients = ingredientsUpdateResult.rows;
 
     return NextResponse.json(ingredients);
   } catch (error) {
-    console.error('GET /ingredients Error:', error);
+    console.error('GET /ingredients_update Error:', error);
     return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
   } finally {
     client.release();

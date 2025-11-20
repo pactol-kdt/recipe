@@ -1,6 +1,6 @@
 'use client';
 
-import { Heart, Plus } from 'lucide-react';
+import { BookOpen, Heart, Plus } from 'lucide-react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
@@ -9,7 +9,7 @@ import HeartLoader from '~/components/Loader';
 import { paths } from '~/meta';
 import { Recipe } from '~/types/recipe';
 
-export default function RecipePage() {
+export default function MakeRecipePage() {
   const router = useRouter();
 
   const [recipes, setRecipes] = useState<Recipe[]>([]);
@@ -37,7 +37,7 @@ export default function RecipePage() {
   recipes.sort((a, b) => a.name.localeCompare(b.name));
   const favorites = recipes.filter((item) => item.is_favorite);
   return (
-    <main className="bg-bg-muted flex h-[calc(100vh-74px-56px)] w-full flex-col items-center">
+    <main className="bg-bg-muted flex w-full flex-col items-center">
       {/* Header */}
       <Header
         title="Recipes"
@@ -46,6 +46,11 @@ export default function RecipePage() {
             icon: <Plus />,
             label: 'Add Recipe',
             fn: () => router.push(`${paths.RECIPE}${paths.ADD}`),
+          },
+          {
+            icon: <BookOpen />,
+            label: 'Recipe Sales',
+            fn: () => router.push(`${paths.RECIPE_SALES}`),
           },
         ]}
         backButton={false}

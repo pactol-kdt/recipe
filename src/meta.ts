@@ -14,14 +14,16 @@ export const logo = {
 
 export const paths = {
   // PAGES
+  AUTH: '/auth',
   DASHBOARD: '/dashboard',
+  EXPENSES: '/expenses',
   INGREDIENT: '/ingredients',
+  LOG: '/logs',
   ORDER: '/orders',
   RECIPE: '/recipes',
-  LOG: '/logs',
-  USER: '/user',
+  RECIPE_SALES: '/recipe-sales',
   SALES_INCOME: '/sales-income',
-  AUTH: '/auth',
+  USER: '/user',
 
   // CRUD
   ADD: '/add',

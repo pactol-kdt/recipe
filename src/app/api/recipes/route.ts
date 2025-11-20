@@ -21,17 +21,10 @@ export const POST = auth(async function POST(req) {
   const client = await pool.connect();
 
   try {
-    const {
-      name,
-      description,
-      cook_time,
-      yield: yieldValue,
-      ingredients,
-      instructions,
-    } = await req.json();
+    const { name, description, cook_time, ingredients, instructions } = await req.json();
 
     // ✅ Validate main recipe fields
-    if (!name || !description || !cook_time || !yieldValue) {
+    if (!name || !description || !cook_time) {
       return NextResponse.json({ error: 'Missing recipe fields' }, { status: 400 });
     }
 
@@ -47,10 +40,10 @@ export const POST = auth(async function POST(req) {
 
     // 🥘 Insert into recipe
     const recipeResult = await client.query(
-      `INSERT INTO recipe (name, description, cook_time, yield)
-       VALUES ($1, $2, $3, $4)
+      `INSERT INTO recipe (name, description, cook_time)
+       VALUES ($1, $2, $3)
        RETURNING *`,
-      [name, description, cook_time, yieldValue]
+      [name, description, cook_time]
     );
 
     const recipe = recipeResult.rows[0];

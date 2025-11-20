@@ -124,11 +124,11 @@ export const PUT = auth(async function PUT(req) {
         // ⚙️ 3️⃣ Subtract from ingredient_list
         const result = await client.query(
           `
-        UPDATE ingredient_list
-        SET quantity = quantity - $1, updated_at = now()
-        WHERE name = $2
-        RETURNING *;
-        `,
+          UPDATE ingredient_list
+          SET quantity = quantity - $1, updated_at = now()
+          WHERE name = $2
+          RETURNING *;
+          `,
           [deductedQty, name]
         );
 
@@ -150,7 +150,7 @@ export const PUT = auth(async function PUT(req) {
 
       // 🧮 2️⃣ Loop through each ingredient and subtract (quantity * batchCount)
       for (const ing of items) {
-        const { name, quantity } = ing;
+        const { name, quantity, cost, date } = ing;
 
         // ⚙️ 3️⃣ Subtract from ingredient_list
         const result = await client.query(
@@ -168,6 +168,25 @@ export const PUT = auth(async function PUT(req) {
           VALUES ($1, $2)
           RETURNING *`,
           [name, result.rows[0].quantity]
+        );
+
+        await client.query(
+          `
+            INSERT INTO daily_totals (date, total_expenses)
+            VALUES ($1, $2)
+            ON CONFLICT (date)
+            DO UPDATE SET total_expenses = daily_totals.total_expenses + EXCLUDED.total_expenses
+          `,
+          [date, cost]
+        );
+
+        await client.query(
+          `
+            INSERT INTO expenses_update (name, amount, date)
+            VALUES ($1, $2, $3)
+            RETURNING *
+          `,
+          [name, cost, date]
         );
 
         if (result.rows.length > 0) {

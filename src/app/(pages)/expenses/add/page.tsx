@@ -2,50 +2,22 @@
 
 import { Check, Pencil, PiggyBank, Plus, Trash2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import Header from '~/components/Header';
-import HeartLoader from '~/components/Loader';
 import { paths } from '~/meta';
-import { Recipe } from '~/types/recipe';
+import { ExpensesUpdate } from '~/types/expenses-update';
 
-type SalesIncome = {
-  name: string;
-  amount: number;
-  date: string;
-  note?: string;
-};
-
-const AddSalesIncomePage = () => {
+const AddExpensesUpdatePage = () => {
   const router = useRouter();
 
-  const [recipes, setRecipes] = useState<Recipe[]>([]);
-  const [loading, setLoading] = useState(true);
-
   const [isEditing, setIsEditing] = useState(false);
-  const [items, setItems] = useState<SalesIncome[]>([]);
+  const [items, setItems] = useState<ExpensesUpdate[]>([]);
 
-  useEffect(() => {
-    const fetchRecipes = async () => {
-      try {
-        const res = await fetch('/api/recipes');
-        const data = await res.json();
-        setRecipes(data);
-        console.log('Fetched recipes:', data);
-      } catch (error) {
-        console.error('Error fetching recipes:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchRecipes();
-  }, []);
-
-  const addSalesIncome = async () => {
-    console.log('Adding sales income...:', items);
+  const addExpensesUpdate = async () => {
+    console.log('Adding expenses_update...:', items);
 
     try {
-      const response = await fetch('/api/sales-income', {
+      const response = await fetch('/api/expenses_update', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(items),
@@ -57,10 +29,10 @@ const AddSalesIncomePage = () => {
 
       const result = await response.json();
 
-      console.log('Sales transaction log successfully:', result);
+      console.log('Expenses transaction log successfully:', result);
       router.push(`${paths.SALES_INCOME}`);
     } catch (error) {
-      console.error('Error saving sales transaction:', error);
+      console.error('Error saving expenses transaction:', error);
     }
   };
 
@@ -74,12 +46,11 @@ const AddSalesIncomePage = () => {
         name: '',
         amount: 0,
         date: localDate,
-        note: '',
       },
     ]);
   };
 
-  const handleChange = (index: number, field: keyof SalesIncome, value: string) => {
+  const handleChange = (index: number, field: keyof ExpensesUpdate, value: string) => {
     setItems((prev) => prev.map((item, i) => (i === index ? { ...item, [field]: value } : item)));
   };
 
@@ -98,17 +69,16 @@ const AddSalesIncomePage = () => {
 
   const hasEmptyFields = items?.some((item) => !item.name.trim());
 
-  if (loading) return <HeartLoader />;
   return (
     <main className="bg-bg-muted flex min-h-screen w-full flex-col items-center">
       {/* Header */}
-      <Header title="Add Sales Income" menuButtons={[]} backButton={true} />
+      <Header title="Add Expenses Update" menuButtons={[]} backButton={true} />
 
       <section className="flex h-[calc(100vh-74px-56px)] w-full max-w-6xl flex-col items-center gap-8 overflow-auto p-4">
         <div className="w-full rounded-2xl bg-white p-4">
           {/* Header */}
           <div className="mb-4 flex items-center justify-between">
-            <h2 className="text-lg font-semibold text-gray-900">SALES INCOME</h2>
+            <h2 className="text-lg font-semibold text-gray-900">EXPENSES UPDATE</h2>
 
             {/* Toggle Edit Mode */}
             <button
@@ -131,23 +101,19 @@ const AddSalesIncomePage = () => {
 
           {items?.length === 0 ? (
             <p className="text-text-secondary text-center text-sm font-light">
-              No cash flow activity yet. Tap <span className="font-bold">Add</span> to log income or
-              expenses.
+              No expenses update yet. Tap <span className="font-bold">Add</span> to log expenses.
             </p>
           ) : (
             // Content
             <div className="mt-4 grid grid-cols-12 gap-2">
-              <label htmlFor="cash-name" className="col-span-4">
+              <label htmlFor="expenses-name" className="col-span-5">
                 Name
               </label>
-              <label htmlFor="cash-quantity" className="col-span-3">
+              <label htmlFor="expenses-quantity" className="col-span-3">
                 Amount
               </label>
-              <label htmlFor="cash-quantity" className="col-span-3">
+              <label htmlFor="expenses-quantity" className="col-span-4">
                 Date
-              </label>
-              <label htmlFor="cash-quantity" className="col-span-2">
-                Note
               </label>
 
               {items.map((item, index) => (
@@ -155,25 +121,18 @@ const AddSalesIncomePage = () => {
                   <input
                     list="sales"
                     type="text"
-                    name={`cash-name`}
-                    id={`cash-name`}
-                    placeholder="Select or type"
+                    name={`expenses-name`}
+                    id={`expenses-name`}
+                    placeholder="Gas, Rent"
                     disabled={!isEditing}
                     onChange={(e) => handleChange(index, 'name', e.target.value)}
-                    className="border-border-base col-span-4 rounded-lg border bg-white p-2 text-sm font-light capitalize"
+                    className="border-border-base col-span-5 rounded-lg border bg-white p-2 text-sm font-light capitalize"
                   />
-
-                  <datalist id="sales">
-                    {recipes.map((recipe, idx) => (
-                      <option key={idx} value={recipe.name} />
-                    ))}
-                    <option value="Office Sales" />
-                  </datalist>
 
                   <input
                     type="number"
-                    name={`cash-amount`}
-                    id={`cash-amount`}
+                    name={`expenses-amount`}
+                    id={`expenses-amount`}
                     placeholder="200"
                     disabled={!isEditing}
                     onChange={(e) => handleChange(index, 'amount', e.target.value)}
@@ -182,20 +141,11 @@ const AddSalesIncomePage = () => {
 
                   <input
                     type="date"
-                    name={`cash-date`}
-                    id={`cash-date`}
+                    name={`expenses-date`}
+                    id={`expenses-date`}
                     value={item.date}
                     onChange={(e) => handleChange(index, 'date', e.target.value)}
-                    className="border-border-base col-span-3 rounded-lg border p-2 text-sm font-light"
-                  />
-
-                  <input
-                    type="text"
-                    name={`cash-note`}
-                    id={`cash-note`}
-                    onChange={(e) => handleChange(index, 'note', e.target.value)}
-                    placeholder="Note"
-                    className="border-border-base col-span-2 rounded-lg border p-2 text-sm font-light"
+                    className="border-border-base col-span-4 rounded-lg border p-2 text-sm font-light"
                   />
 
                   {isEditing && (
@@ -212,14 +162,14 @@ const AddSalesIncomePage = () => {
             </div>
           )}
 
-          {/* ADD SALES INCOME */}
+          {/* ADD EXPENSES UPDATE */}
           {isEditing && (
             <button
               type="button"
               onClick={handleAdd}
               className="mt-5 flex w-full items-center justify-center gap-2 rounded-md border border-dashed border-gray-300 py-2 text-sm text-gray-600 active:scale-95"
             >
-              <Plus size={16} /> Add Sales Income
+              <Plus size={16} /> Add Expenses Update
             </button>
           )}
         </div>
@@ -229,10 +179,10 @@ const AddSalesIncomePage = () => {
           <button
             type="button"
             className="bg-accent flex items-center justify-center gap-2 rounded-2xl p-2 font-bold text-white active:scale-95"
-            onClick={addSalesIncome}
+            onClick={addExpensesUpdate}
           >
             <PiggyBank />
-            Add Sales Income
+            Add Expenses Update
           </button>
         </div>
       </section>
@@ -240,4 +190,4 @@ const AddSalesIncomePage = () => {
   );
 };
 
-export default AddSalesIncomePage;
+export default AddExpensesUpdatePage;
