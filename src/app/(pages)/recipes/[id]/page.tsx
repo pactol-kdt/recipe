@@ -4,7 +4,6 @@ import {
   ArrowLeft,
   Check,
   Clock3,
-  Flame,
   Heart,
   List,
   LoaderCircle,

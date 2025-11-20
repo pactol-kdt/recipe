@@ -1,6 +1,6 @@
 'use client';
 
-import { Check, Pencil, Plus, Save, Trash2 } from 'lucide-react';
+import { Check, Pencil, Plus, Trash2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import Header from '~/components/Header';

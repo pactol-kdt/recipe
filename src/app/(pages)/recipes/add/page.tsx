@@ -8,8 +8,8 @@ import InstructionsSection from './_components/instruction';
 import ErrorLabel from '~/components/ErrorLabel';
 import { useRouter } from 'next/navigation';
 import { paths } from '~/meta';
-import { IngredientList } from '~/app/(pages)/ingredients/page';
 import HeartLoader from '~/components/Loader';
+import { IngredientList } from '~/types/ingredient-list';
 
 type Ingredient = {
   name: string;
@@ -28,7 +28,6 @@ export default function AddNewRecipePage() {
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
   const [cookTime, setCookTime] = useState('');
-  const [yieldCount, setYieldCount] = useState('');
 
   const [ingredientsData, setIngredientsData] = useState<Ingredient[]>([]);
   const [instructionsData, setInstructionsData] = useState<Instruction[]>([]);
@@ -62,7 +61,6 @@ export default function AddNewRecipePage() {
       name,
       description,
       cookTime,
-      yieldCount,
       ingredientsData,
       instructionsData
     );
@@ -73,7 +71,6 @@ export default function AddNewRecipePage() {
       name.trim() === '' ||
       description.trim() === '' ||
       cookTime.trim() === '' ||
-      yieldCount.trim() === '' ||
       ingredientsData.length === 0 ||
       instructionsData.length === 0
     ) {
@@ -91,7 +88,6 @@ export default function AddNewRecipePage() {
           name,
           description,
           cook_time: +cookTime,
-          yield: +yieldCount,
           ingredients: ingredientsData,
           instructions: instructionsData,
         }),

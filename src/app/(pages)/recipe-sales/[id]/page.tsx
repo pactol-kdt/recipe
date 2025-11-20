@@ -5,7 +5,6 @@ import { useEffect, useState } from 'react';
 import ErrorLabel from '~/components/ErrorLabel';
 import Header from '~/components/Header';
 import HeartLoader from '~/components/Loader';
-import { formatDate } from '~/lib/formatDate';
 import { paths } from '~/meta';
 import { RecipeSales } from '~/types/recipe-sales';
 
@@ -35,7 +34,7 @@ const EditRecipeSalesPage = () => {
     };
 
     fetchRecipeSales();
-  }, []);
+  }, [id]);
 
   const saveRecipe = async () => {
     setIsSubmit(true);

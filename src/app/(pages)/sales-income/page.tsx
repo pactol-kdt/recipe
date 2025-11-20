@@ -45,7 +45,6 @@ export default function SalesIncomePage() {
 
   if (loading) return <HeartLoader />;
 
-  const cash = summary.current_month_sales - summary.current_month_expenses;
   return (
     <main className="bg-bg-muted flex h-[calc(100vh-74px-56px)] w-full flex-col items-center">
       {/* Header */}

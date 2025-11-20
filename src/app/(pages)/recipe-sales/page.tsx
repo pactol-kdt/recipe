@@ -1,14 +1,11 @@
 'use client';
 
-import { Heart, Plus } from 'lucide-react';
-import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import Header from '~/components/Header';
 import HeartLoader from '~/components/Loader';
 import { formatDate } from '~/lib/formatDate';
 import { paths } from '~/meta';
-import { Recipe } from '~/types/recipe';
 import { RecipeSales } from '~/types/recipe-sales';
 
 export default function RecipeSalesPage() {
