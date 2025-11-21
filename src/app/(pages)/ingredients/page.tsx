@@ -177,8 +177,9 @@ export default function IngredientsPage() {
           {isEditing && (
             <button
               type="button"
-              className="col-span-12 flex items-center justify-center gap-4 rounded-sm border border-red-500 p-2 text-red-500"
+              className={`${selectedIngredients.length === 0 ? 'opacity-50' : ''} mt-4 flex w-full items-center justify-center gap-4 rounded-sm border border-red-500 bg-white p-2 text-red-500`}
               onClick={handleDelete}
+              disabled={selectedIngredients.length === 0}
             >
               <Trash2 size={18} /> Delete
             </button>

@@ -1,6 +1,6 @@
 'use client';
 
-import { Check, Pencil, PiggyBank, Plus, Trash2 } from 'lucide-react';
+import { BanknoteArrowDown, Check, Pencil, Plus, Trash2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import Header from '~/components/Header';
@@ -178,11 +178,12 @@ const AddExpensesUpdatePage = () => {
         <div className="flex w-full flex-col justify-between gap-4">
           <button
             type="button"
-            className="bg-accent flex items-center justify-center gap-2 rounded-2xl p-2 font-bold text-white active:scale-95"
+            className={`${items.length === 0 || isEditing ? 'opacity-50' : 'active:scale-95'} bg-accent flex items-center justify-center gap-2 rounded-2xl p-2 font-bold text-white`}
             onClick={addExpensesUpdate}
+            disabled={items.length === 0 && isEditing}
           >
-            <PiggyBank />
-            Add Expenses Update
+            <BanknoteArrowDown />
+            Restock Ingredients
           </button>
         </div>
       </section>

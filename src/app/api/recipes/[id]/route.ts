@@ -78,7 +78,7 @@ export const PUT = auth(async function PUT(req, { params }: { params: Promise<{ 
       [name, description, is_favorite, recipeId]
     );
 
-    // Delete old ingredients + instructions (optional if you want full overwrite)
+    // Delete old ingredients + instructions
     await client.query('DELETE FROM ingredients WHERE recipe_id = $1', [recipeId]);
     await client.query('DELETE FROM instruction WHERE recipe_id = $1', [recipeId]);
 

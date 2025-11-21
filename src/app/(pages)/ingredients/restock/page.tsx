@@ -255,7 +255,6 @@ const AddIngredientsPage = () => {
             <Box />
             Restock Ingredients
           </button>
-          {/* <span className="text-light text-center text-red-400">{errorMessage}</span> */}
         </div>
       </section>
     </main>

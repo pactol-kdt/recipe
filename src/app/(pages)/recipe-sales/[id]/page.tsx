@@ -44,11 +44,10 @@ const EditRecipeSalesPage = () => {
     }));
   };
 
-  const saveRecipe = async () => {
+  const saveRecipeIncome = async () => {
     setIsSubmit(true);
     console.log(recipeSales.date === '', recipeSales.quantity == 0, recipeSales.sold_count == 0);
 
-    // Validate data
     if (recipeSales.date === '' || (recipeSales.quantity == 0 && recipeSales.sold_count == 0)) {
       setErrorMessage(
         'Please fill in all fields and add at least one ingredient and instruction, and save.'
@@ -180,7 +179,7 @@ const EditRecipeSalesPage = () => {
           <button
             type="button"
             className="bg-accent flex items-center justify-center gap-2 rounded-2xl p-2 font-bold text-white active:scale-95"
-            onClick={saveRecipe}
+            onClick={saveRecipeIncome}
           >
             <Save />
             Save Recipe Sales

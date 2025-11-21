@@ -44,9 +44,11 @@ export const POST = auth(async function POST(req) {
 
     // Insert into recipe_sales table
     await client.query(
-      `INSERT INTO recipe_sales (name, batch_made)
-          VALUES ($1, $2)
-          RETURNING *`,
+      ` INSERT INTO recipe_sales (name, batch_made, date)
+        VALUES ($1, $2, CURRENT_DATE)
+        ON CONFLICT (name, date)
+        DO UPDATE SET batch_made = recipe_sales.batch_made + EXCLUDED.batch_made
+        RETURNING *`,
       [name, batch_made]
     );
 

@@ -4,6 +4,42 @@ import pool from '~/lib/db';
 import { Ingredient } from '~/types/ingredients';
 import { Instruction } from '~/types/instruction';
 
+export const GET = auth(async function GET(req) {
+  if (!req.auth) {
+    return NextResponse.json({ message: 'Not authenticated' }, { status: 401 });
+  }
+
+  const client = await pool.connect();
+
+  try {
+    // Fetch all recipes
+    const recipeResult = await client.query(`SELECT * FROM recipe ORDER BY id DESC`);
+    const recipes = recipeResult.rows;
+
+    // Fetch all ingredients
+    const ingredientsResult = await client.query(`SELECT * FROM ingredients`);
+    const ingredients = ingredientsResult.rows;
+
+    // Fetch all instructions
+    const instructionsResult = await client.query(`SELECT * FROM instruction`);
+    const instructions = instructionsResult.rows;
+
+    // Combine data into structured format
+    const fullRecipes = recipes.map((recipe) => ({
+      ...recipe,
+      ingredients: ingredients.filter((ing) => ing.recipe_id === recipe.id),
+      instructions: instructions.filter((inst) => inst.recipe_id === recipe.id),
+    }));
+
+    return NextResponse.json(fullRecipes);
+  } catch (error) {
+    console.error('GET /recipe Error:', error);
+    return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
+  } finally {
+    client.release();
+  }
+});
+
 export const POST = auth(async function POST(req) {
   if (!req.auth) {
     return NextResponse.json({ message: 'Not authenticated' }, { status: 401 });
@@ -82,42 +118,6 @@ export const POST = auth(async function POST(req) {
   } catch (error) {
     await client.query('ROLLBACK');
     console.error('POST /recipe Error:', error);
-    return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
-  } finally {
-    client.release();
-  }
-});
-
-export const GET = auth(async function GET(req) {
-  if (!req.auth) {
-    return NextResponse.json({ message: 'Not authenticated' }, { status: 401 });
-  }
-
-  const client = await pool.connect();
-
-  try {
-    // 📦 Fetch all recipes
-    const recipeResult = await client.query(`SELECT * FROM recipe ORDER BY id DESC`);
-    const recipes = recipeResult.rows;
-
-    // 🧂 Fetch all ingredients
-    const ingredientsResult = await client.query(`SELECT * FROM ingredients`);
-    const ingredients = ingredientsResult.rows;
-
-    // 📜 Fetch all instructions
-    const instructionsResult = await client.query(`SELECT * FROM instruction`);
-    const instructions = instructionsResult.rows;
-
-    // 🔗 Combine data into structured format
-    const fullRecipes = recipes.map((recipe) => ({
-      ...recipe,
-      ingredients: ingredients.filter((ing) => ing.recipe_id === recipe.id),
-      instructions: instructions.filter((inst) => inst.recipe_id === recipe.id),
-    }));
-
-    return NextResponse.json(fullRecipes);
-  } catch (error) {
-    console.error('GET /recipe Error:', error);
     return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
   } finally {
     client.release();

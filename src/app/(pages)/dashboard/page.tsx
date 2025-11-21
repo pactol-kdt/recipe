@@ -61,7 +61,7 @@ export default function DashboardPage() {
               Update: {formatDate(dashboardData.ingredientsLastUpdate)}
             </div>
             <div
-              className={`${dashboardData.lowStockCount != 0 ? 'text-red-600' : 'text-green-600'} text-4xl`}
+              className={`${dashboardData.lowStockCount != 0 ? 'text-red-800' : 'text-green-800'} text-4xl`}
             >
               {dashboardData.lowStockCount}
             </div>
@@ -79,7 +79,7 @@ export default function DashboardPage() {
           </div>
           <div className="flex items-center justify-end gap-2">
             <div
-              className={`${dashboardData.pendingSalesCount != 0 ? 'text-red-600' : 'text-green-600'} text-4xl`}
+              className={`${dashboardData.pendingSalesCount != 0 ? 'text-red-800' : 'text-green-800'} text-4xl`}
             >
               {dashboardData.pendingSalesCount}
             </div>
@@ -92,10 +92,10 @@ export default function DashboardPage() {
             <div className="text-sm font-bold">SOLD COUNT</div>
             <div className="flex items-center justify-between gap-2">
               <div
-                className={`${dashboardData.recipeSales.sold_percentage_change >= 0 ? 'text-green-600' : 'text-red-600'} text-light text-sm`}
+                className={`${dashboardData.recipeSales.sold_percentage_change >= 0 ? 'text-green-800' : 'text-red-800'} text-light text-sm font-bold`}
               >
                 {dashboardData.recipeSales.sold_percentage_change >= 0 ? '+' : ''}
-                {dashboardData.recipeSales.sold_percentage_change}
+                {dashboardData.recipeSales.sold_percentage_change}%
               </div>
               <div className="text-4xl">{dashboardData.recipeSales.current_week_sold}</div>
             </div>
@@ -107,10 +107,10 @@ export default function DashboardPage() {
               <div className="text-sm font-bold">BATCH MADE</div>
               <div className="flex items-center justify-between gap-2">
                 <div
-                  className={`${dashboardData.recipeSales.batch_made_percentage_change >= 0 ? 'text-green-600' : 'text-red-600'} text-light text-sm`}
+                  className={`${dashboardData.recipeSales.batch_made_percentage_change >= 0 ? 'text-green-800' : 'text-red-800'} text-light text-sm font-bold`}
                 >
                   {dashboardData.recipeSales.batch_made_percentage_change >= 0 ? '+' : ''}
-                  {dashboardData.recipeSales.batch_made_percentage_change}
+                  {dashboardData.recipeSales.batch_made_percentage_change}%
                 </div>
                 <div className="text-4xl">{dashboardData.recipeSales.current_week_batch_made}</div>
               </div>
