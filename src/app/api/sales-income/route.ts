@@ -10,7 +10,7 @@ export const GET = auth(async function GET(req) {
   const client = await pool.connect();
 
   try {
-    // 📦 Fetch all ingredients
+    // Fetch all sales income
     const salesIncomeResult = await client.query(`
       SELECT * FROM sales_income ORDER BY id ASC
     `);

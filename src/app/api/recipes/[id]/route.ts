@@ -16,7 +16,7 @@ export const GET = auth(async function GET(req, context: { params: Promise<{ id:
       return NextResponse.json({ error: 'Invalid recipe ID' }, { status: 400 });
     }
 
-    // 🥘 Get the recipe
+    // Get recipe by ID
     const recipeResult = await client.query(`SELECT * FROM recipe WHERE id = $1`, [recipeId]);
 
     if (recipeResult.rows.length === 0) {
@@ -25,12 +25,12 @@ export const GET = auth(async function GET(req, context: { params: Promise<{ id:
 
     const recipe = recipeResult.rows[0];
 
-    // 🧂 Get ingredients
+    // Get ingredients
     const ingredientsResult = await client.query(`SELECT * FROM ingredients WHERE recipe_id = $1`, [
       recipeId,
     ]);
 
-    // 📜 Get instructions
+    // Get instructions
     const instructionsResult = await client.query(
       `SELECT * FROM instruction WHERE recipe_id = $1`,
       [recipeId]
@@ -70,7 +70,7 @@ export const PUT = auth(async function PUT(req, { params }: { params: Promise<{ 
 
     await client.query('BEGIN');
 
-    // Update main recipe
+    // Update recipe table
     await client.query(
       `UPDATE recipe
        SET name = $1, description = $2, is_favorite = $3, updated_at = now()

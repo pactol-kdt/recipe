@@ -10,22 +10,23 @@ import { RecipeSales } from '~/types/recipe-sales';
 
 const EditRecipeSalesPage = () => {
   const params = useParams();
-  const id = Number(params.id); // convert to number for safety
+  const id = Number(params.id);
   const router = useRouter();
 
   const [recipeSales, setRecipeSales] = useState<RecipeSales>({} as RecipeSales);
-  const [loading, setLoading] = useState(true);
 
   const [errorMessage, setErrorMessage] = useState('');
+  const [loading, setLoading] = useState(true);
   const [isSubmit, setIsSubmit] = useState(false);
 
   useEffect(() => {
     const fetchRecipeSales = async () => {
       try {
-        const res = await fetch(`/api/recipe_sales/${id}`); // GET route
+        const res = await fetch(`/api/recipe_sales/${id}`);
         const data = await res.json();
-        console.log('Fetched recipe sales:', data);
         setRecipeSales(data);
+
+        console.log('Fetched recipe sales:', data);
       } catch (error) {
         console.error('Error fetching recipe sales:', error);
       } finally {
@@ -36,10 +37,18 @@ const EditRecipeSalesPage = () => {
     fetchRecipeSales();
   }, [id]);
 
+  const handleChange = (field: keyof RecipeSales, value: RecipeSales[keyof RecipeSales]) => {
+    setRecipeSales((prev) => ({
+      ...prev,
+      [field]: value,
+    }));
+  };
+
   const saveRecipe = async () => {
     setIsSubmit(true);
     console.log(recipeSales.date === '', recipeSales.quantity == 0, recipeSales.sold_count == 0);
-    // Basic validation
+
+    // Validate data
     if (recipeSales.date === '' || (recipeSales.quantity == 0 && recipeSales.sold_count == 0)) {
       setErrorMessage(
         'Please fill in all fields and add at least one ingredient and instruction, and save.'
@@ -67,20 +76,14 @@ const EditRecipeSalesPage = () => {
       const result = await response.json();
 
       console.log('Recipe saved successfully:', result);
-      router.push(`${paths.RECIPE_SALES}`); // Redirect to recipe list
+
+      router.push(`${paths.RECIPE_SALES}`);
     } catch (error) {
       console.error('Error saving recipe:', error);
     }
   };
 
   if (loading) return <HeartLoader />;
-
-  const handleChange = (field: keyof RecipeSales, value: RecipeSales[keyof RecipeSales]) => {
-    setRecipeSales((prev) => ({
-      ...prev,
-      [field]: value,
-    }));
-  };
 
   return (
     <main className="bg-bg-muted flex min-h-screen w-full flex-col items-center">
@@ -90,6 +93,7 @@ const EditRecipeSalesPage = () => {
       {/* Content */}
       <section className="flex h-[calc(100vh-74px-56px)] w-full max-w-6xl flex-col items-center gap-8 overflow-auto p-4">
         <div className="w-full rounded-2xl bg-white p-4">
+          {/* Title */}
           <h2 className="font-bold">DETAILS</h2>
 
           <div className="mt-4 flex flex-col gap-2">
@@ -161,7 +165,7 @@ const EditRecipeSalesPage = () => {
                 value={recipeSales.date ? recipeSales.date.split('T')[0] : ''}
               />
 
-              {/* Error message (shown only when empty on submit) */}
+              {/* Error message */}
               <ErrorLabel
                 message="Date is required."
                 isSubmit={isSubmit}

@@ -7,13 +7,7 @@ import Header from '~/components/Header';
 import HeartLoader from '~/components/Loader';
 import { paths } from '~/meta';
 import { Recipe } from '~/types/recipe';
-
-type SalesIncome = {
-  name: string;
-  amount: number;
-  date: string;
-  note?: string;
-};
+import { SalesIncome } from '~/types/sales-income';
 
 const AddSalesIncomePage = () => {
   const router = useRouter();
@@ -23,6 +17,9 @@ const AddSalesIncomePage = () => {
 
   const [isEditing, setIsEditing] = useState(false);
   const [items, setItems] = useState<SalesIncome[]>([]);
+
+  const today = new Date();
+  const localDate = today.toISOString().slice(0, 10);
 
   useEffect(() => {
     const fetchRecipes = async () => {
@@ -42,8 +39,6 @@ const AddSalesIncomePage = () => {
   }, []);
 
   const addSalesIncome = async () => {
-    console.log('Adding sales income...:', items);
-
     try {
       const response = await fetch('/api/sales-income', {
         method: 'POST',
@@ -63,9 +58,6 @@ const AddSalesIncomePage = () => {
       console.error('Error saving sales transaction:', error);
     }
   };
-
-  const today = new Date();
-  const localDate = today.toISOString().slice(0, 10);
 
   const handleAdd = () => {
     setItems((prev) => [
@@ -106,7 +98,7 @@ const AddSalesIncomePage = () => {
 
       <section className="flex h-[calc(100vh-74px-56px)] w-full max-w-6xl flex-col items-center gap-8 overflow-auto p-4">
         <div className="w-full rounded-2xl bg-white p-4">
-          {/* Header */}
+          {/* Title */}
           <div className="mb-4 flex items-center justify-between">
             <h2 className="text-lg font-semibold text-gray-900">SALES INCOME</h2>
 
@@ -152,6 +144,7 @@ const AddSalesIncomePage = () => {
 
               {items.map((item, index) => (
                 <div key={index} className="col-span-12 grid grid-cols-12 items-center gap-2">
+                  {/* Name */}
                   <input
                     list="sales"
                     type="text"
@@ -170,6 +163,7 @@ const AddSalesIncomePage = () => {
                     <option value="Office Sales" />
                   </datalist>
 
+                  {/* Amount */}
                   <input
                     type="number"
                     name={`cash-amount`}
@@ -180,6 +174,7 @@ const AddSalesIncomePage = () => {
                     className="border-border-base col-span-3 rounded-lg border bg-white p-2 text-sm font-light"
                   />
 
+                  {/* Date */}
                   <input
                     type="date"
                     name={`cash-date`}
@@ -189,6 +184,7 @@ const AddSalesIncomePage = () => {
                     className="border-border-base col-span-3 rounded-lg border p-2 text-sm font-light"
                   />
 
+                  {/* Note */}
                   <input
                     type="text"
                     name={`cash-note`}
@@ -198,6 +194,7 @@ const AddSalesIncomePage = () => {
                     className="border-border-base col-span-2 rounded-lg border p-2 text-sm font-light"
                   />
 
+                  {/* Editing mode */}
                   {isEditing && (
                     <button
                       type="button"
@@ -212,7 +209,7 @@ const AddSalesIncomePage = () => {
             </div>
           )}
 
-          {/* ADD SALES INCOME */}
+          {/* Add sales income */}
           {isEditing && (
             <button
               type="button"

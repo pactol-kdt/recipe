@@ -10,7 +10,7 @@ export const GET = auth(async function GET(req) {
   const client = await pool.connect();
 
   try {
-    // 📦 Fetch all recipe_sales
+    // Fetch all recipe_sales
     const recipeSalesResult = await client.query(`
         WITH weekly_totals AS (
             SELECT
@@ -51,21 +51,25 @@ export const GET = auth(async function GET(req) {
         LEFT JOIN last_week l ON TRUE;
     `);
 
+    // Fetch latest ingredients update
     const ingredientsUpdateResult = await client.query(`
         SELECT created_at FROM ingredients_update
         ORDER BY id DESC LIMIT 1
     `);
 
+    // Fetch low stock ingredients count
     const ingredientsListResult = await client.query(`
         SELECT COUNT(*) AS low_stock_count
         FROM public.ingredient_list
         WHERE quantity < minimum_required;
     `);
 
+    // Fetch total cash
     const cashResult = await client.query(`
         SELECT SUM(net_profit) AS cash FROM daily_totals
     `);
 
+    // Fetch pending sales count
     const pendingSalesResult = await client.query(`
         SELECT COUNT(*) AS pending_count
         FROM public.recipe_sales

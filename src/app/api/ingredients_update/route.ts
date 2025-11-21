@@ -10,7 +10,7 @@ export const GET = auth(async function GET(req) {
   const client = await pool.connect();
 
   try {
-    // 📦 Fetch all ingredients_update
+    // Fetch all ingredients_update
     const ingredientsUpdateResult = await client.query(`
       SELECT *,
             CASE 

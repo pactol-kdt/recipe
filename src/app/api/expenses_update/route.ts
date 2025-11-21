@@ -10,7 +10,7 @@ export const GET = auth(async function GET(req) {
   const client = await pool.connect();
 
   try {
-    // 📦 Fetch all expenses_update
+    // Fetch all expenses_update
     const expensesUpdatesResult = await client.query(
       `SELECT * FROM expenses_update ORDER BY id DESC`
     );

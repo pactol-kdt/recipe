@@ -1,12 +1,7 @@
 import { Check, Pencil, Plus, Trash2 } from 'lucide-react';
 import { useEffect, useState } from 'react';
-import { IngredientList } from '~/app/(pages)/ingredients/page';
-
-type Ingredient = {
-  name: string;
-  quantity: string;
-  unit: string;
-};
+import { IngredientList } from '~/types/ingredient-list';
+import { Ingredient } from '~/types/ingredients';
 
 const IngredientsSection = ({
   ingredients,
@@ -19,35 +14,20 @@ const IngredientsSection = ({
   isSubmit: boolean;
   ingredientList: IngredientList[];
 }) => {
-  const [isEditing, setIsEditing] = useState(false);
   const [items, setItems] = useState(ingredients);
+
+  const [isEditing, setIsEditing] = useState(false);
 
   useEffect(() => {
     setItems(ingredients);
   }, [ingredients]);
-
-  const handleRemove = (index: number) => {
-    setItems((prev) => prev.filter((_, i) => i !== index));
-  };
-
-  const handleSave = () => {
-    const hasEmpty = items.some(
-      (item) => !item.name.trim() || !item.quantity.trim() || !item.unit.trim()
-    );
-
-    if (hasEmpty) return;
-
-    setIngredients(items);
-    setIsEditing(false);
-    console.log(items);
-  };
 
   const handleAdd = () => {
     setItems((prev) => [
       ...prev,
       {
         name: '',
-        quantity: '',
+        quantity: 0,
         unit: 'g',
       },
     ]);
@@ -57,9 +37,21 @@ const IngredientsSection = ({
     setItems((prev) => prev.map((item, i) => (i === index ? { ...item, [field]: value } : item)));
   };
 
-  const hasEmptyFields = items.some(
-    (item) => !item.name.trim() || !item.quantity.trim() || !item.unit.trim()
-  );
+  const handleRemove = (index: number) => {
+    setItems((prev) => prev.filter((_, i) => i !== index));
+  };
+
+  const handleSave = () => {
+    const hasEmpty = items.some((item) => !item.name.trim() || !item.unit.trim());
+
+    if (hasEmpty) return;
+
+    setIngredients(items);
+    setIsEditing(false);
+    console.log(items);
+  };
+
+  const hasEmptyFields = items.some((item) => !item.name.trim() || !item.unit.trim());
 
   return (
     <div className="w-full rounded-2xl bg-white p-4">
@@ -107,7 +99,6 @@ const IngredientsSection = ({
           </label>
 
           {items.map((item, index) => {
-            // collect all selected names
             const selectedNames = items.map((i) => i.name);
 
             return (
@@ -129,8 +120,7 @@ const IngredientsSection = ({
                   {ingredientList
                     .filter(
                       (ingredient) =>
-                        // show ingredient if it's not selected anywhere else
-                        !selectedNames.includes(ingredient.name) || ingredient.name === item.name // keep current selection visible
+                        !selectedNames.includes(ingredient.name) || ingredient.name === item.name
                     )
                     .map((ingredient) => (
                       <option key={ingredient.id} value={ingredient.name}>
@@ -181,7 +171,7 @@ const IngredientsSection = ({
         </div>
       )}
 
-      {/* ADD INGREDIENTS */}
+      {/* Add Ingredients */}
       {isEditing && (
         <button
           type="button"

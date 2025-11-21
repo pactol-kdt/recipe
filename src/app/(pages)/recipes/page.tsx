@@ -13,12 +13,13 @@ export default function MakeRecipePage() {
   const router = useRouter();
 
   const [recipes, setRecipes] = useState<Recipe[]>([]);
+
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchRecipes = async () => {
       try {
-        const res = await fetch('/api/recipes'); // GET route
+        const res = await fetch('/api/recipes');
         const data = await res.json();
         setRecipes(data);
       } catch (error) {

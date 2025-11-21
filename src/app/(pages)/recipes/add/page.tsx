@@ -10,40 +10,30 @@ import { useRouter } from 'next/navigation';
 import { paths } from '~/meta';
 import HeartLoader from '~/components/Loader';
 import { IngredientList } from '~/types/ingredient-list';
-
-type Ingredient = {
-  name: string;
-  quantity: string;
-  unit: string;
-};
-
-type Instruction = {
-  title: string;
-  description: string;
-};
+import { Ingredient } from '~/types/ingredients';
+import { Instruction } from '~/types/instruction';
 
 export default function AddNewRecipePage() {
   const router = useRouter();
 
-  const [name, setName] = useState('');
-  const [description, setDescription] = useState('');
-  const [cookTime, setCookTime] = useState('');
-
   const [ingredientsData, setIngredientsData] = useState<Ingredient[]>([]);
+  const [ingredientList, setIngredientList] = useState<IngredientList[]>([]);
   const [instructionsData, setInstructionsData] = useState<Instruction[]>([]);
 
+  const [cookTime, setCookTime] = useState('');
+  const [description, setDescription] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
   const [isSubmit, setIsSubmit] = useState(false);
-
-  const [ingredientList, setIngredientList] = useState<IngredientList[]>([]);
   const [loading, setLoading] = useState(true);
+  const [name, setName] = useState('');
 
   useEffect(() => {
     const fetchIngredients = async () => {
       try {
-        const res = await fetch('/api/ingredients'); // GET route
+        const res = await fetch('/api/ingredients');
         const data = await res.json();
         setIngredientList(data);
+
         console.log('Fetched ingredients:', data);
       } catch (error) {
         console.error('Error fetching ingredients:', error);
@@ -56,17 +46,8 @@ export default function AddNewRecipePage() {
   }, []);
 
   const saveRecipe = async () => {
-    console.log(
-      'Saving recipe...:',
-      name,
-      description,
-      cookTime,
-      ingredientsData,
-      instructionsData
-    );
     setIsSubmit(true);
 
-    // Basic validation
     if (
       name.trim() === '' ||
       description.trim() === '' ||
@@ -100,7 +81,7 @@ export default function AddNewRecipePage() {
       const result = await response.json();
 
       console.log('Recipe saved successfully:', result);
-      router.push(`${paths.RECIPE}`); // Redirect to recipe list
+      router.push(`${paths.RECIPE}`);
     } catch (error) {
       console.error('Error saving recipe:', error);
     }
@@ -113,9 +94,9 @@ export default function AddNewRecipePage() {
       {/* Header */}
       <Header title="Add New Recipe" menuButtons={[]} backButton={true} />
 
-      {/* Content */}
       <section className="flex h-[calc(100vh-74px-56px)] w-full max-w-6xl flex-col items-center gap-8 overflow-auto p-4">
         <div className="w-full rounded-2xl bg-white p-4">
+          {/* Title */}
           <h2 className="font-bold">DETAILS</h2>
 
           <div className="mt-4 flex flex-col gap-2">

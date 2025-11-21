@@ -16,7 +16,7 @@ export const GET = auth(async function GET(req, context: { params: Promise<{ id:
       return NextResponse.json({ error: 'Invalid recipe sales ID' }, { status: 400 });
     }
 
-    // 🥘 Get the recipe
+    // Get the recipe sales by ID
     const recipeSalesResult = await client.query(`SELECT * FROM recipe_sales WHERE id = $1`, [
       recipeSalesId,
     ]);
@@ -55,7 +55,7 @@ export const PUT = auth(async function PUT(req, { params }: { params: Promise<{ 
 
     await client.query('BEGIN');
 
-    // Update main recipe
+    // Update recipe_sales table
     await client.query(
       `UPDATE recipe_sales
        SET name = $1, batch_made = $2, sold_count = $3, quantity = $4, date = $5,updated_at = now()
@@ -70,52 +70,6 @@ export const PUT = auth(async function PUT(req, { params }: { params: Promise<{ 
     await client.query('ROLLBACK');
     console.error('PUT /recipe/[id] Error:', error);
     return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
-  } finally {
-    client.release();
-  }
-});
-
-export const DELETE = auth(async function DELETE(
-  req,
-  { params }: { params: Promise<{ id: string }> }
-) {
-  if (!req.auth) {
-    return NextResponse.json({ message: 'Not authenticated' }, { status: 401 });
-  }
-
-  const { id } = await params; // ✅ await params
-  const client = await pool.connect();
-
-  try {
-    const recipeId = Number(id);
-
-    if (isNaN(recipeId)) {
-      return NextResponse.json({ error: 'Invalid recipe ID' }, { status: 400 });
-    }
-
-    await client.query('BEGIN');
-
-    // Delete from related tables first
-    await client.query('DELETE FROM ingredients WHERE recipe_id = $1', [recipeId]);
-    await client.query('DELETE FROM instruction WHERE recipe_id = $1', [recipeId]);
-
-    // Finally, delete the recipe itself
-    const result = await client.query('DELETE FROM recipe WHERE id = $1 RETURNING *', [recipeId]);
-
-    if (result.rowCount === 0) {
-      throw new Error('Recipe not found');
-    }
-
-    await client.query('COMMIT');
-
-    return NextResponse.json({
-      message: 'Recipe and related data deleted successfully',
-      deletedRecipe: result.rows[0],
-    });
-  } catch (err) {
-    await client.query('ROLLBACK');
-    console.error('Delete failed:', err);
-    return NextResponse.json({ error: 'Failed to delete recipe' }, { status: 500 });
   } finally {
     client.release();
   }

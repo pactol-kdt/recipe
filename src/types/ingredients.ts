@@ -1,9 +1,9 @@
 export type Ingredient = {
-  id: number;
+  id?: number;
   name: string;
   quantity: number;
   unit: string;
 
-  created_at: string;
-  updated_at: string;
+  created_at?: string;
+  updated_at?: string;
 };

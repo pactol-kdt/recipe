@@ -15,26 +15,13 @@ const InstructionsSection = ({
   setInstruction: (value: Instruction[]) => void;
   isSubmit: boolean;
 }) => {
-  const [isEditing, setIsEditing] = useState(false);
   const [items, setItems] = useState(instructions);
 
-  const handleRemove = (index: number) => {
-    setItems((prev) => prev.filter((_, i) => i !== index));
-  };
+  const [isEditing, setIsEditing] = useState(false);
 
   useEffect(() => {
     setItems(instructions);
   }, [instructions]);
-
-  const handleSave = () => {
-    const hasEmpty = items.some((item) => !item.description.trim() || !item.title.trim());
-    console.log(items);
-    if (hasEmpty) return;
-
-    setInstruction(items);
-    setIsEditing(false);
-    console.log(items);
-  };
 
   const handleAdd = () => {
     setItems((prev) => [
@@ -49,6 +36,20 @@ const InstructionsSection = ({
 
   const handleChange = (index: number, field: keyof Instruction, value: string) => {
     setItems((prev) => prev.map((item, i) => (i === index ? { ...item, [field]: value } : item)));
+  };
+
+  const handleRemove = (index: number) => {
+    setItems((prev) => prev.filter((_, i) => i !== index));
+  };
+
+  const handleSave = () => {
+    const hasEmpty = items.some((item) => !item.description.trim() || !item.title.trim());
+    console.log(items);
+    if (hasEmpty) return;
+
+    setInstruction(items);
+    setIsEditing(false);
+    console.log(items);
   };
 
   const hasEmptyFields = items.some((item) => !item.description.trim() || !item.title.trim());

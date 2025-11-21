@@ -11,7 +11,7 @@ export const GET = auth(async function GET(req) {
   const client = await pool.connect();
 
   try {
-    // 📦 Fetch all recipe_sales
+    // Fetch all recipe_sales
     const recipeSalesUpdate = await client.query(`SELECT * FROM recipe_sales ORDER BY id ASC`);
     const recipeSales = recipeSalesUpdate.rows;
 
@@ -40,10 +40,9 @@ export const POST = auth(async function POST(req) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
     }
 
-    // Start transaction
     await client.query('BEGIN');
 
-    // Insert into expenses_update table
+    // Insert into recipe_sales table
     await client.query(
       `INSERT INTO recipe_sales (name, batch_made)
           VALUES ($1, $2)

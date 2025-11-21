@@ -19,21 +19,18 @@ export type IngredientLog = {
 
 export default function IngredientsLogPage() {
   const [ingredients, setIngredients] = useState<IngredientLog[]>([]);
-  const [search, setSearch] = useState('');
-  const [loading, setLoading] = useState(true);
 
-  // Fetch logs
+  const [loading, setLoading] = useState(true);
+  const [search, setSearch] = useState('');
+
   useEffect(() => {
     const fetchIngredients = async () => {
       try {
         const res = await fetch('/api/ingredients_update');
         const data = await res.json();
-        // Sort by most recent update
-        data.sort(
-          (a: IngredientLog, b: IngredientLog) =>
-            new Date(b.updated_at!).getTime() - new Date(a.updated_at!).getTime()
-        );
         setIngredients(data);
+
+        console.log('Fetched ingredients logs:', data);
       } catch (error) {
         console.error('Error fetching ingredients:', error);
       } finally {
@@ -46,12 +43,12 @@ export default function IngredientsLogPage() {
 
   if (loading) return <HeartLoader />;
 
-  // 🧮 Filter by name
+  // Filter by name
   const filtered = ingredients.filter((ing) =>
     ing.name.toLowerCase().includes(search.toLowerCase())
   );
 
-  // 🧱 Group by ingredient name
+  // Group by ingredient name
   const grouped = filtered.reduce(
     (acc, ing) => {
       if (!acc[ing.name]) acc[ing.name] = [];
@@ -61,16 +58,16 @@ export default function IngredientsLogPage() {
     {} as Record<string, IngredientLog[]>
   );
 
-  console.log(grouped);
   return (
     <main className="bg-bg-muted flex min-h-screen w-full flex-col items-center">
       <Header title="Log" menuButtons={[]} backButton={false} />
 
       <section className="flex h-[calc(100vh-74px-56px)] w-full max-w-6xl flex-col items-center gap-8 overflow-auto p-4">
         <div className="w-full">
+          {/* Title */}
           <h2 className="mb-4 text-xl font-medium">Activity Log</h2>
 
-          {/* 🔍 Search Input */}
+          {/* Search Input */}
           <input
             type="text"
             placeholder="Search ingredient name..."
@@ -79,7 +76,7 @@ export default function IngredientsLogPage() {
             className="mb-4 w-full rounded-md border border-gray-300 bg-white p-2 text-sm outline-none focus:ring-2 focus:ring-blue-400"
           />
 
-          {/* 🧾 Log Display */}
+          {/* Log Display */}
           {Object.keys(grouped).length === 0 ? (
             <p className="text-gray-500">No logs found.</p>
           ) : (
@@ -98,14 +95,13 @@ export default function IngredientsLogPage() {
                     </thead>
                     <tbody>
                       {logs.slice(0, 3).map((log, idx) => {
-                        // Compare to the **next log**, which is older
                         const olderLog = idx < logs.length - 1 ? logs[idx + 1] : null;
                         let description = '';
                         const quantity = +log.quantity;
                         const olderQuantity = olderLog ? +olderLog.quantity : 0;
 
                         if (log.is_new === true) {
-                          description = 'New product'; // oldest entry
+                          description = 'New product';
                         } else if (quantity > olderQuantity) {
                           description = `Restocked (+${quantity - olderQuantity})`;
                         } else if (quantity < olderQuantity) {

@@ -12,17 +12,18 @@ export default function IngredientsPage() {
   const router = useRouter();
 
   const [ingredients, setIngredients] = useState<IngredientList[]>([]);
-  const [loading, setLoading] = useState(true);
 
   const [isEditing, setIsEditing] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [selectedIngredients, setSelectedIngredients] = useState<number[]>([]);
 
   useEffect(() => {
     const fetchIngredients = async () => {
       try {
-        const res = await fetch('/api/ingredients'); // GET route
+        const res = await fetch('/api/ingredients');
         const data = await res.json();
         setIngredients(data);
+
         console.log('Fetched ingredients:', data);
       } catch (error) {
         console.error('Error fetching ingredients:', error);
@@ -99,6 +100,7 @@ export default function IngredientsPage() {
       {/* Content */}
       <section className="flex h-[calc(100vh-74px-56px)] w-full max-w-6xl flex-col items-center gap-8 overflow-auto p-4">
         <div className="w-full">
+          {/* Title */}
           <h2 className="mb-4 text-xl font-medium">Restock Needed</h2>
 
           {lowStocks.length ? (
@@ -171,6 +173,7 @@ export default function IngredientsPage() {
             )}
           </div>
 
+          {/* Delete button */}
           {isEditing && (
             <button
               type="button"

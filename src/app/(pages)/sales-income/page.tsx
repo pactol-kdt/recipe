@@ -24,6 +24,7 @@ export default function SalesIncomePage() {
   const router = useRouter();
 
   const [summary, setSummary] = useState<SalesIncome>({} as SalesIncome);
+
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {

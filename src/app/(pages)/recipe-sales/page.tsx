@@ -12,15 +12,17 @@ export default function RecipeSalesPage() {
   const router = useRouter();
 
   const [recipeSales, setRecipes] = useState<RecipeSales[]>([]);
+
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchRecipeSales = async () => {
       try {
-        const res = await fetch('/api/recipe_sales'); // GET route
+        const res = await fetch('/api/recipe_sales');
         const data = await res.json();
-        console.log('Fetched recipe sales:', data);
         setRecipes(data);
+
+        console.log('Fetched recipe sales:', data);
       } catch (error) {
         console.error('Error fetching recipe sales:', error);
       } finally {
@@ -35,6 +37,7 @@ export default function RecipeSalesPage() {
 
   // Sort Recipe Sales in ASC order
   recipeSales.sort((a, b) => a.name.localeCompare(b.name));
+
   const pendingSales = recipeSales.filter((item) => item.quantity === 0 || item.sold_count === 0);
 
   return (
@@ -69,9 +72,7 @@ export default function RecipeSalesPage() {
                 </button>
               ))
             ) : (
-              <p className="text-text-secondary">
-                No tasty creations here yet. Add your first recipe!
-              </p>
+              <p className="text-text-secondary">No pending orders. Go find a new one!</p>
             )}
           </div>
         </div>

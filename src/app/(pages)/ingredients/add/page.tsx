@@ -13,17 +13,18 @@ const AddIngredientsPage = () => {
   const router = useRouter();
 
   const [ingredients, setIngredients] = useState<IngredientList[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [items, setItems] = useState<IngredientList[]>([]);
 
   const [isEditing, setIsEditing] = useState(false);
-  const [items, setItems] = useState<IngredientList[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchIngredients = async () => {
       try {
-        const res = await fetch('/api/ingredients'); // GET route
+        const res = await fetch('/api/ingredients');
         const data = await res.json();
         setIngredients(data);
+
         console.log('Fetched ingredients:', data);
       } catch (error) {
         console.error('Error fetching ingredients:', error);
@@ -36,7 +37,7 @@ const AddIngredientsPage = () => {
   }, []);
 
   const addIngredients = async () => {
-    console.log('Saving recipe...:', items);
+    console.log('Adding ingredients...:', items);
 
     try {
       const response = await fetch('/api/ingredients', {
@@ -87,13 +88,14 @@ const AddIngredientsPage = () => {
     console.log(items);
   };
 
+  if (loading) return <HeartLoader />;
+
+  // Sort Ingredients in ASC order
+  ingredients.sort((a, b) => a.name.localeCompare(b.name));
+
   const hasEmptyFields = items?.some(
     (item) => !item.name.trim() || !item.unit!.trim() || !item.quantity || !item.minimum_required
   );
-
-  if (loading) return <HeartLoader />;
-  ingredients.sort((a, b) => a.name.localeCompare(b.name));
-
   return (
     <main className="bg-bg-muted flex min-h-screen w-full flex-col items-center">
       {/* Header */}
@@ -101,9 +103,9 @@ const AddIngredientsPage = () => {
 
       <section className="flex h-[calc(100vh-74px-56px)] w-full max-w-6xl flex-col items-center gap-8 overflow-auto p-4">
         <div className="w-full rounded-2xl bg-white p-4">
-          {/* Header */}
+          {/* Title */}
           <div className="mb-4 flex items-center justify-between">
-            <h2 className="text-lg font-semibold text-gray-900">INGREDIENTS</h2>
+            <h2 className="text-lg font-semibold text-gray-900">INGREDIENTS LIST</h2>
 
             {/* Toggle Edit Mode */}
             <button
@@ -144,6 +146,7 @@ const AddIngredientsPage = () => {
                 Unit
               </label>
 
+              {/* Ingredient List */}
               {items?.map((item, index) => (
                 <div key={index} className="col-span-12 grid grid-cols-12 items-center gap-2">
                   <input
@@ -211,7 +214,7 @@ const AddIngredientsPage = () => {
             </div>
           )}
 
-          {/* ADD INGREDIENTS */}
+          {/* Add Ingredients */}
           {isEditing && (
             <button
               type="button"
@@ -234,7 +237,6 @@ const AddIngredientsPage = () => {
             <Plus />
             Add Ingredients
           </button>
-          {/* <span className="text-light text-center text-red-400">{errorMessage}</span> */}
         </div>
       </section>
     </main>

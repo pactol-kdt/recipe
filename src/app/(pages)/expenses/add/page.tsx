@@ -10,12 +10,14 @@ import { ExpensesUpdate } from '~/types/expenses-update';
 const AddExpensesUpdatePage = () => {
   const router = useRouter();
 
-  const [isEditing, setIsEditing] = useState(false);
   const [items, setItems] = useState<ExpensesUpdate[]>([]);
 
-  const addExpensesUpdate = async () => {
-    console.log('Adding expenses_update...:', items);
+  const [isEditing, setIsEditing] = useState(false);
 
+  const today = new Date();
+  const localDate = today.toISOString().slice(0, 10);
+
+  const addExpensesUpdate = async () => {
     try {
       const response = await fetch('/api/expenses_update', {
         method: 'POST',
@@ -35,9 +37,6 @@ const AddExpensesUpdatePage = () => {
       console.error('Error saving expenses transaction:', error);
     }
   };
-
-  const today = new Date();
-  const localDate = today.toISOString().slice(0, 10);
 
   const handleAdd = () => {
     setItems((prev) => [
@@ -76,7 +75,7 @@ const AddExpensesUpdatePage = () => {
 
       <section className="flex h-[calc(100vh-74px-56px)] w-full max-w-6xl flex-col items-center gap-8 overflow-auto p-4">
         <div className="w-full rounded-2xl bg-white p-4">
-          {/* Header */}
+          {/* Title */}
           <div className="mb-4 flex items-center justify-between">
             <h2 className="text-lg font-semibold text-gray-900">EXPENSES UPDATE</h2>
 
@@ -116,6 +115,7 @@ const AddExpensesUpdatePage = () => {
                 Date
               </label>
 
+              {/* Expenses List */}
               {items.map((item, index) => (
                 <div key={index} className="col-span-12 grid grid-cols-12 items-center gap-2">
                   <input
@@ -162,7 +162,7 @@ const AddExpensesUpdatePage = () => {
             </div>
           )}
 
-          {/* ADD EXPENSES UPDATE */}
+          {/* Add Expenses List */}
           {isEditing && (
             <button
               type="button"

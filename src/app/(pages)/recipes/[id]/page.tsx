@@ -20,25 +20,25 @@ import { Recipe } from '~/types/recipe';
 
 export default function IngredientPage() {
   const params = useParams();
-  const id = Number(params.id); // convert to number for safety
+  const id = Number(params.id);
   const router = useRouter();
 
   const [recipe, setRecipe] = useState<Recipe>({} as Recipe);
-  const [loading, setLoading] = useState(true);
-  const [updateLoading, setUpdateLoading] = useState(false);
-  const [isMaking, setIsMaking] = useState(false);
 
-  const [tab, setTab] = useState<'ingredients' | 'instruction'>('ingredients');
   const [batchCount, setBatchCount] = useState(1);
+  const [isMaking, setIsMaking] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [tab, setTab] = useState<'ingredients' | 'instruction'>('ingredients');
+  const [updateLoading, setUpdateLoading] = useState(false);
 
   useEffect(() => {
     const fetchRecipes = async () => {
       try {
-        const res = await fetch(`/api/recipes/${id}`); // GET route
+        const res = await fetch(`/api/recipes/${id}`);
         const data = await res.json();
+        setRecipe(data);
 
         console.log(data);
-        setRecipe(data);
       } catch (error) {
         console.error('Error fetching recipes:', error);
       } finally {
@@ -46,7 +46,7 @@ export default function IngredientPage() {
       }
     };
 
-    if (id) fetchRecipes(); // only run when id is ready
+    if (id) fetchRecipes();
   }, [id]);
 
   const handleDelete = async (id: number) => {
@@ -68,20 +68,6 @@ export default function IngredientPage() {
       alert('Error deleting ingredients');
     }
   };
-
-  async function updateRecipe(id: number, data: Recipe) {
-    const res = await fetch(`/api/recipes/${id}`, {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(data),
-    });
-
-    if (!res.ok) {
-      throw new Error('Failed to update recipe');
-    }
-
-    return res.json();
-  }
 
   const makeRecipe = async () => {
     console.log('Making recipe with batch count:', batchCount, id);
@@ -125,10 +111,6 @@ export default function IngredientPage() {
     }
   };
 
-  const handleTabs = (tabName: 'ingredients' | 'instruction') => {
-    setTab(tabName);
-  };
-
   const handleFavorite = async () => {
     if (!recipe) return;
 
@@ -151,9 +133,27 @@ export default function IngredientPage() {
     }
   };
 
+  const handleTabs = (tabName: 'ingredients' | 'instruction') => {
+    setTab(tabName);
+  };
+
   const toggleMaking = () => {
     setIsMaking(!isMaking);
   };
+
+  async function updateRecipe(id: number, data: Recipe) {
+    const res = await fetch(`/api/recipes/${id}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data),
+    });
+
+    if (!res.ok) {
+      throw new Error('Failed to update recipe');
+    }
+
+    return res.json();
+  }
 
   if (loading) return <HeartLoader />;
   if (recipe.error) {
@@ -163,7 +163,6 @@ export default function IngredientPage() {
 
   return (
     <main className="relative h-screen overflow-hidden">
-      {/* IMAGE */}
       <div className="relative h-[328px] w-full">
         {/* Image */}
         <Image
@@ -205,7 +204,7 @@ export default function IngredientPage() {
         </div>
       </div>
 
-      {/* CONTENT */}
+      {/* Content */}
       <div className="absolute top-[300px] left-0 h-[calc(100vh-300px-56px)] w-full overflow-y-auto rounded-t-2xl bg-gray-100 px-4 py-6">
         <div className="flex flex-col gap-4">
           <div className="mt-2">
@@ -219,11 +218,11 @@ export default function IngredientPage() {
             </div>
           </div>
 
-          {/* SEPERATOR */}
+          {/* Seperator */}
           <div className="bg-border-base h-[2px]"></div>
 
           <div className="flex items-center justify-between">
-            {/* BATCH COUNT */}
+            {/* Batch Count */}
             <div className="flex items-center gap-4">
               <label htmlFor="batch-count">Batch Count</label>
               <input
@@ -236,7 +235,7 @@ export default function IngredientPage() {
               />
             </div>
 
-            {/* MAKE */}
+            {/* Make */}
             {isMaking ? (
               <button
                 type="button"
@@ -258,7 +257,7 @@ export default function IngredientPage() {
             )}
           </div>
 
-          {/* TABS */}
+          {/* Tabs */}
           <div className="border-border-base flex w-full gap-2 rounded-4xl border bg-white p-1">
             <button
               type="button"
@@ -276,7 +275,7 @@ export default function IngredientPage() {
             </button>
           </div>
 
-          {/* INGREDIENTS */}
+          {/* Ingredients */}
           {tab === 'ingredients' && (
             <div className="flex flex-col gap-2 rounded-2xl bg-white p-4">
               {recipe.ingredients?.map((ingredient, idx) => (
@@ -290,7 +289,7 @@ export default function IngredientPage() {
             </div>
           )}
 
-          {/* INSTRUCTION */}
+          {/* Instruction */}
           {tab === 'instruction' && (
             <div className="flex flex-col gap-6 rounded-2xl bg-white p-4">
               {recipe.instruction?.map((item, idx) => (

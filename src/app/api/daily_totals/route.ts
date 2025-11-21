@@ -10,7 +10,7 @@ export const GET = auth(async function GET(req) {
   const client = await pool.connect();
 
   try {
-    // 📦 Fetch all daily totals
+    // Fetch all daily totals
     const result = await client.query(`
       WITH monthly_totals AS (
         SELECT
@@ -35,7 +35,6 @@ export const GET = auth(async function GET(req) {
       )
       SELECT
         COALESCE(c.sales, 0) AS current_month_sales,
-        COALESCE(l.sales, 0) AS last_month_sales,
         ROUND(
           CASE WHEN COALESCE(l.sales, 0) = 0 THEN 0
               ELSE (c.sales - l.sales) * 100.0 / l.sales END,
@@ -43,7 +42,6 @@ export const GET = auth(async function GET(req) {
         ) AS sales_percentage_change,
 
         COALESCE(c.expenses, 0) AS current_month_expenses,
-        COALESCE(l.expenses, 0) AS last_month_expenses,
         ROUND(
           CASE WHEN COALESCE(l.expenses, 0) = 0 THEN 0
               ELSE (c.expenses - l.expenses) * 100.0 / l.expenses END,
@@ -51,7 +49,6 @@ export const GET = auth(async function GET(req) {
         ) AS expenses_percentage_change,
 
         COALESCE(c.net_profit, 0) AS current_month_net_profit,
-        COALESCE(l.net_profit, 0) AS last_month_net_profit,
         ROUND(
           CASE WHEN COALESCE(l.net_profit, 0) = 0 THEN 0
               ELSE (c.net_profit - l.net_profit) * 100.0 / l.net_profit END,

@@ -11,14 +11,16 @@ import { DashboardData } from '~/types/dashboard';
 
 export default function DashboardPage() {
   const [dashboardData, setDashboardData] = useState<DashboardData>({} as DashboardData);
+
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchDashboard = async () => {
       try {
-        const res = await fetch('/api/dashboard'); // GET route
+        const res = await fetch('/api/dashboard');
         const data = await res.json();
         setDashboardData(data);
+
         console.log('Fetched dashboard datas:', data);
       } catch (error) {
         console.error('Error fetching dashboard data:', error);
@@ -45,6 +47,7 @@ export default function DashboardPage() {
           <div className="text-4xl">PHP {dashboardData.cash}</div>
         </div>
 
+        {/* Restock Ingredients */}
         <Link
           href={`${paths.INGREDIENT}`}
           className="flex w-full flex-col gap-4 rounded-2xl bg-white p-4 active:scale-95"
@@ -65,6 +68,7 @@ export default function DashboardPage() {
           </div>
         </Link>
 
+        {/* Recipe Sales */}
         <Link
           href={`${paths.RECIPE_SALES}`}
           className="flex w-full flex-col gap-4 rounded-2xl bg-white p-4 active:scale-95"
@@ -83,6 +87,7 @@ export default function DashboardPage() {
         </Link>
 
         <div className="flex w-full justify-between gap-4">
+          {/* Sold Count */}
           <div className="flex w-full flex-col gap-4 rounded-2xl bg-white p-4">
             <div className="text-sm font-bold">SOLD COUNT</div>
             <div className="flex items-center justify-between gap-2">
@@ -96,6 +101,7 @@ export default function DashboardPage() {
             </div>
           </div>
 
+          {/* Batch Made */}
           <div className="flex w-full justify-between gap-4">
             <div className="flex w-full flex-col gap-4 rounded-2xl bg-white p-4">
               <div className="text-sm font-bold">BATCH MADE</div>

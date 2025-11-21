@@ -10,7 +10,7 @@ export const GET = auth(async function GET(req) {
   const client = await pool.connect();
 
   try {
-    // 📦 Fetch all ingredients
+    // Fetch all ingredients
     const ingredientsResult = await client.query(`SELECT * FROM ingredient_list ORDER BY id DESC`);
     const ingredients = ingredientsResult.rows;
 
@@ -48,6 +48,7 @@ export const POST = auth(async function POST(req) {
         throw new Error('Missing required fields');
       }
 
+      // Insert into ingredient_list table
       const result = await client.query(
         `INSERT INTO ingredient_list (name, quantity, minimum_required, unit)
           VALUES ($1, $2, $3, $4)
@@ -61,6 +62,7 @@ export const POST = auth(async function POST(req) {
         [name, quantity, minimum_required, unit]
       );
 
+      // Insert into ingredients_update table
       await client.query(
         `INSERT INTO ingredients_update (name, quantity)
           VALUES ($1, $2)

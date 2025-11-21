@@ -12,17 +12,18 @@ const AddIngredientsPage = () => {
   const router = useRouter();
 
   const [ingredients, setIngredients] = useState<IngredientList[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [items, setItems] = useState<IngredientList[]>([]);
 
   const [isEditing, setIsEditing] = useState(false);
-  const [items, setItems] = useState<IngredientList[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchIngredients = async () => {
       try {
-        const res = await fetch('/api/ingredients'); // GET route
+        const res = await fetch('/api/ingredients');
         const data = await res.json();
         setIngredients(data);
+
         console.log('Fetched ingredients:', data);
       } catch (error) {
         console.error('Error fetching ingredients:', error);

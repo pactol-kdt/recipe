@@ -1,17 +1,8 @@
 import { NextResponse } from 'next/server';
 import { auth } from '~/auth';
 import pool from '~/lib/db';
-
-interface Ingredient {
-  name: string;
-  quantity: number;
-  unit: string;
-}
-
-interface Instruction {
-  title: string;
-  description: string;
-}
+import { Ingredient } from '~/types/ingredients';
+import { Instruction } from '~/types/instruction';
 
 export const POST = auth(async function POST(req) {
   if (!req.auth) {
@@ -23,12 +14,10 @@ export const POST = auth(async function POST(req) {
   try {
     const { name, description, cook_time, ingredients, instructions } = await req.json();
 
-    // ✅ Validate main recipe fields
     if (!name || !description || !cook_time) {
       return NextResponse.json({ error: 'Missing recipe fields' }, { status: 400 });
     }
 
-    // ✅ Validate nested data
     if (!Array.isArray(ingredients) || !Array.isArray(instructions)) {
       return NextResponse.json(
         { error: 'Ingredients and instructions must be arrays' },
@@ -38,7 +27,7 @@ export const POST = auth(async function POST(req) {
 
     await client.query('BEGIN');
 
-    // 🥘 Insert into recipe
+    // Insert into recipe table
     const recipeResult = await client.query(
       `INSERT INTO recipe (name, description, cook_time)
        VALUES ($1, $2, $3)
@@ -49,7 +38,7 @@ export const POST = auth(async function POST(req) {
     const recipe = recipeResult.rows[0];
     const recipeId = recipe.id;
 
-    // 🧂 Insert ingredients
+    // Insert ingredients
     const insertedIngredients: Ingredient[] = [];
     for (const ingredient of ingredients) {
       const { name, quantity, unit } = ingredient;
@@ -66,7 +55,7 @@ export const POST = auth(async function POST(req) {
       insertedIngredients.push(ingResult.rows[0]);
     }
 
-    // 📜 Insert instructions
+    // Insert instructions
     const insertedInstructions: Instruction[] = [];
     for (const instruction of instructions) {
       const { title, description } = instruction;
