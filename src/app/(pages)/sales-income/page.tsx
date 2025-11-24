@@ -8,13 +8,13 @@ import HeartLoader from '~/components/Loader';
 import { paths } from '~/meta';
 
 type SalesIncome = {
-  cash: number;
   current_month_expenses: number;
   current_month_sales: number;
   current_month_net_profit: number;
   last_month_expenses: number;
   last_month_sales: number;
   last_month_net_profit: number;
+  total_net_profit: number;
   sales_percentage_change: number;
   expenses_percentage_change: number;
   net_profit_percentage_change: number;
@@ -71,7 +71,7 @@ export default function SalesIncomePage() {
         {/* Cash */}
         <div className="flex w-full flex-col gap-4 rounded-2xl bg-[linear-gradient(to_bottom_right,#FF809E_0%,#FF99B1_100%)] p-4 pb-8 text-white">
           <div className="text-sm font-bold">REMAINING CASH</div>
-          <div className="text-4xl">PHP {summary.cash}</div>
+          <div className="text-4xl">PHP {summary.total_net_profit}</div>
         </div>
 
         {/* Sales Income */}
