@@ -8,6 +8,7 @@ import {
   List,
   LoaderCircle,
   Microwave,
+  Pencil,
   Trash2,
   TrendingUp,
 } from 'lucide-react';
@@ -48,6 +49,12 @@ export default function IngredientPage() {
 
     if (id) fetchRecipes();
   }, [id]);
+
+  useEffect(() => {
+    if (recipe?.error) {
+      router.push(paths.NOT_FOUND);
+    }
+  }, [recipe?.error, router]);
 
   const handleDelete = async (id: number) => {
     try {
@@ -156,10 +163,7 @@ export default function IngredientPage() {
   }
 
   if (loading) return <HeartLoader />;
-  if (recipe.error) {
-    router.push(paths.RECIPE);
-    return null;
-  }
+  if (recipe?.error) return null;
 
   return (
     <main className="relative h-screen overflow-hidden">
@@ -188,6 +192,14 @@ export default function IngredientPage() {
             onClick={() => handleDelete(recipe.id)}
           >
             <Trash2 className="" color="red" />
+          </button>
+
+          {/* Edit Button */}
+          <button
+            className="active:bg-bg-muted rounded-full bg-white p-2 active:scale-95"
+            onClick={() => router.push(`${paths.RECIPE}/${recipe.id}${paths.EDIT}`)}
+          >
+            <Pencil className="" color="black" />
           </button>
 
           {/* Favorite Button */}

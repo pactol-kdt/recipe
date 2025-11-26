@@ -73,7 +73,9 @@ const AddIngredientsPage = () => {
 
   const handleChange = (index: number, field: keyof IngredientList, value: string) => {
     setItems((prev) =>
-      prev.map((item, i) => (i === index ? { ...item, [field]: capitalize(value) } : item))
+      prev.map((item, i) =>
+        i === index ? { ...item, [field]: field === 'name' ? capitalize(value) : value } : item
+      )
     );
   };
 
@@ -191,7 +193,7 @@ const AddIngredientsPage = () => {
                     id="ingredient-unit"
                     disabled={!isEditing}
                     onChange={(e) => handleChange(index, 'unit', e.target.value)}
-                    className="border-border-base col-span-3 rounded-lg border bg-white p-2 text-sm font-light"
+                    className="border-border-base bg-bg-muted col-span-3 rounded-lg border p-2 text-sm font-light"
                   >
                     <option value="g">g</option>
                     <option value="ml">ml</option>
