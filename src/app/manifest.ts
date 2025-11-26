@@ -1,0 +1,42 @@
+import type { MetadataRoute } from 'next';
+
+export default function manifest(): MetadataRoute.Manifest {
+  return {
+    name: 'Love, Cheewi Monitoring',
+    short_name: 'Love, Cheewi',
+    description: 'Track recipes, ingredients, expenses, and sales for Love, Cheewi.',
+    id: '/',
+    scope: '/',
+    start_url: '/',
+    display: 'standalone',
+    lang: 'en',
+    dir: 'ltr',
+    orientation: 'portrait',
+    background_color: '#ffffff',
+    theme_color: '#ff809e',
+    icons: [
+      {
+        src: '/icons/icon-192x192.png',
+        sizes: '192x192',
+        type: 'image/png',
+      },
+      {
+        src: '/icons/icon-512x512.png',
+        sizes: '512x512',
+        type: 'image/png',
+      },
+      {
+        src: '/icons/maskable-icon-192x192.png',
+        sizes: '192x192',
+        type: 'image/png',
+        purpose: 'maskable',
+      },
+      {
+        src: '/icons/maskable-icon-512x512.png',
+        sizes: '512x512',
+        type: 'image/png',
+        purpose: 'maskable',
+      },
+    ],
+  };
+}

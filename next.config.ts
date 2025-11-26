@@ -1,18 +1,16 @@
-import withPWA from 'next-pwa';
+import type { NextConfig } from 'next';
+import withPWAInit from 'next-pwa';
 
-/** @type {import('next').NextConfig} */
-const nextConfig = {
-  reactStrictMode: true,
-  turbopack: {
-    root: __dirname, // ✅ Force the correct project root
-  },
-};
-
-// Wrap Next.js config with next-pwa
-export default withPWA({
-  ...nextConfig,
+const withPWA = withPWAInit({
   dest: 'public',
   register: true,
   skipWaiting: true,
-  disable: process.env.NODE_ENV === 'development', // SW only in dev
+  disable: process.env.NODE_ENV === 'development',
 });
+
+const nextConfig: NextConfig = {
+  reactStrictMode: true,
+};
+
+// Cast to sidestep the mismatched NextConfig type bundled in @types/next-pwa.
+export default (withPWA as unknown as (config: NextConfig) => NextConfig)(nextConfig);

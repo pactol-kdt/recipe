@@ -4,7 +4,7 @@ import './globals.css';
 export const metadata: Metadata = {
   title: 'Love, Cheewi Monitoring',
   description: 'Track recipes, ingredients, expenses, and sales',
-  manifest: '/manifest.json',
+  manifest: '/manifest.webmanifest',
 };
 
 export const viewport = {

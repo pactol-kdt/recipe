@@ -2,8 +2,13 @@
   "name": "Love, Cheewi Monitoring",
   "short_name": "Love, Cheewi",
   "description": "Track recipes, ingredients, expenses, and sales for Love, Cheewi.",
+  "id": "/",
+  "scope": "/",
   "start_url": "/",
   "display": "standalone",
+  "lang": "en",
+  "dir": "ltr",
+  "orientation": "portrait",
   "background_color": "#ffffff",
   "theme_color": "#ff809e",
   "icons": [
