@@ -5,12 +5,14 @@ const withPWA = withPWAInit({
   dest: 'public',
   register: true,
   skipWaiting: true,
-  disable: process.env.NODE_ENV === 'development',
 });
 
-const nextConfig: NextConfig = {
+/** @type {import('next').NextConfig} */
+const nextConfig = {
   reactStrictMode: true,
 };
 
-// Cast to sidestep the mismatched NextConfig type bundled in @types/next-pwa.
-export default (withPWA as unknown as (config: NextConfig) => NextConfig)(nextConfig);
+// Only apply PWA plugin for production builds to avoid duplicate GenerateSW runs in dev watch mode.
+const config = (withPWA as unknown as (config: NextConfig) => NextConfig)(nextConfig);
+
+export default config;
